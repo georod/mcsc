@@ -7,7 +7,7 @@
 
 -- Note: This version also create buffers for linear features to help processing
 
-DROP VIEW buildings;
+DROP VIEW IF EXISTS buildings;
 CREATE OR REPLACE VIEW buildings AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'building'::varchar(30) AS feature,
@@ -20,7 +20,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 
 COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2022-12-19]';
 
-DROP VIEW lf_roads;
+DROP VIEW IF EXISTS lf_roads;
 CREATE OR REPLACE VIEW lf_roads AS
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
@@ -60,7 +60,7 @@ CREATE OR REPLACE VIEW lf_roads_bf AS
 );
 
 
-DROP VIEW lf_rails;
+DROP VIEW IF EXISTS lf_rails;
 CREATE OR REPLACE VIEW lf_rails AS
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
@@ -95,7 +95,7 @@ CREATE OR REPLACE VIEW lf_rails_bf AS
 );
 
 
-DROP VIEW open_green;
+DROP VIEW IF EXISTS open_green;
 CREATE OR REPLACE VIEW open_green AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'open_green_area'::varchar(30) AS feature,
@@ -106,7 +106,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse' IN ('grass', 'cemetery', 'greenfield', 'recreation_ground',  'winter_sports','brownfield', 'construction') or tags ->> 'natural' IN ('tundra') or tags->> 'golf'<>'rough' or tags->> 'highway'='construction'
 	;
 
-DROP VIEW hetero_green;
+DROP VIEW IF EXISTS hetero_green;
 CREATE OR REPLACE VIEW hetero_green AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'hetero_green_area'::varchar(30) AS feature,
@@ -117,7 +117,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'natural'IN('garden', 'scrub', 'sand', 'shrub') or  tags->> 'landuse'IN('plant_nursery', 'meadow',  'flowerbed') or tags->> 'meadow'<>'' or tags->> 'golf' = 'rough'
 	;
 	
-DROP VIEW dense_green;
+DROP VIEW IF EXISTS dense_green;
 CREATE OR REPLACE VIEW dense_green AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'dense_green_area'::varchar(30) AS feature,
@@ -128,7 +128,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'IN('forest') or tags->>'natural'='wood' or tags ->> 'boundary' = 'forest'
 	;
 
-DROP VIEW resourceful_green;
+DROP VIEW IF EXISTS resourceful_green;
 CREATE OR REPLACE VIEW resourceful_green AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'resourceful_green_area'::varchar(30) AS feature,
@@ -139,7 +139,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse' IN ('orchard','farmland', 'landfill','vineyard', 'farmyard','allotments')
 	;
 
-DROP VIEW water;
+DROP VIEW IF EXISTS water;
 CREATE OR REPLACE VIEW water AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'water'::varchar(30) AS feature,
@@ -150,7 +150,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'='basin' or tags ->> 'natural' IN ('water', 'wetland') or tags ->> 'water' <>''
 	;
 
-DROP VIEW parking_surface;
+DROP VIEW IF EXISTS parking_surface;
 CREATE OR REPLACE VIEW parking_surface AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'parking_surface'::varchar(30) AS feature,
@@ -161,7 +161,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'parking'='surface'
 	;
 
-DROP VIEW residential;
+DROP VIEW IF EXISTS residential;
 CREATE OR REPLACE VIEW residential AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'residential'::varchar(30) AS feature,
@@ -172,7 +172,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'='residential'
 	;
 	
-DROP VIEW commercial_industrial;
+DROP VIEW IF EXISTS commercial_industrial;
 CREATE OR REPLACE VIEW commercial_industrial AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'commercial_industrial'::varchar(30) AS feature,
@@ -183,7 +183,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'IN('commercial',  'retail', 'industrial')
 	;
 
-DROP VIEW institutional;
+DROP VIEW IF EXISTS institutional;
 CREATE OR REPLACE VIEW institutional AS	
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'institutional'::varchar(30) AS feature,
@@ -194,7 +194,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'IN('institutional',  'education', 'religious')
 	;
 
-DROP VIEW barrier;
+DROP VIEW IF EXISTS barrier;
 CREATE OR REPLACE VIEW barrier AS	
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),  
 	'barrier'::varchar(30) AS feature,
@@ -212,7 +212,7 @@ CREATE OR REPLACE VIEW barrier_bf AS
 );
 
 
-DROP VIEW landuse_park;
+DROP VIEW IF EXISTS landuse_park;
 CREATE OR REPLACE VIEW landuse_park AS	
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
 	'institutional'::varchar(30) AS feature,
