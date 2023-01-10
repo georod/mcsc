@@ -70,6 +70,7 @@ con_pg <- DBI::dbConnect(
 # List of city names found in OSM (OpenStreetMap)
 #city <- c('Peterborough', 'Brantford') # 'Brantford'
 city <- city[!is.na(city$admin_level),]
+city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[1:3,]
 
 # Loop for creating city spatial envelopes
@@ -77,14 +78,14 @@ city <- city[!is.na(city$admin_level),]
 
 for (j in 1:nrow(city)) {
   
-  dbSendQuery(con_pg, paste0("DROP TABLE IF EXISTS ", city$osm_city[j],"_env", " CASCADE;"))
+  dbSendQuery(con_pg, paste0("DROP TABLE IF EXISTS ", city$pg_city[j],"_env", " CASCADE;"))
   
-  dbSendQuery(con_pg, paste0("CREATE TABLE ", city$osm_city[j],"_env", "  AS SELECT (row_number() OVER ())::int AS sid, relation_id::varchar(20), 'background'::varchar(30) AS feature, tags->>'name'::varchar(30)  AS type, tags ->> 'admin_level'::varchar(30) AS material, '' AS size, st_envelope(st_buffer(st_envelope(st_multi(st_buildarea(geom))), 500))::geometry(Polygon, 3857) AS geom  FROM boundaries WHERE tags->> 'boundary' IN ('administrative') AND tags->> 'name'=","'", city$osm_city[j],"'" , " AND tags ->> 'admin_level'=","'",city$admin_level[j], "';"))
+  dbSendQuery(con_pg, paste0("CREATE TABLE ", city$pg_city[j],"_env", "  AS SELECT (row_number() OVER ())::int AS sid, relation_id::varchar(20), 'background'::varchar(30) AS feature, tags->>'name'::varchar(30)  AS type, tags ->> 'admin_level'::varchar(30) AS material, '' AS size, st_envelope(st_buffer(st_envelope(st_multi(st_buildarea(geom))), 500))::geometry(Polygon, 3857) AS geom  FROM boundaries WHERE tags->> 'boundary' IN ('administrative') AND tags->> 'name'=","'", city$osm_city[j],"'" , " AND tags ->> 'admin_level'=","'",city$admin_level[j], "';"))
   
-  dbSendQuery(con_pg, paste0("ALTER TABLE ", city$osm_city[j],"_env", " ADD CONSTRAINT ", city$osm_city[j],"_env", "_pkey PRIMARY KEY (sid);"))
+  dbSendQuery(con_pg, paste0("ALTER TABLE ", city$pg_city[j],"_env", " ADD CONSTRAINT ", city$pg_osm_city[j],"_env", "_pkey PRIMARY KEY (sid);"))
   
-  dbSendQuery(con_pg, paste0("CREATE INDEX ", city$osm_city[j],"_env", "_geom_idx ON ", city$osm_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
-  
+  dbSendQuery(con_pg, paste0("CREATE INDEX ", city$pg_city[j],"_env", "_geom_idx ON ", city$pg_osm_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
+
   
 }
   
