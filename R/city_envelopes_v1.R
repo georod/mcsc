@@ -35,7 +35,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 # project output folder
 outF <- "projects/def-mfortin/georod/data/mcsc-proj/"
 
-city <- read.csv("~/misc/mcsc_city_list1.csv")
+city <- read.csv("./misc/mcsc_city_list1.csv")
 
 #=================================
 # Connect to PG db
@@ -74,19 +74,20 @@ city <- city[!is.na(city$admin_level),]
 
 # Loop for creating city spatial envelopes
 
+
 for (j in 1:nrow(city)) {
-  
   
   dbSendQuery(con_pg, paste0("DROP TABLE IF EXISTS ", city$osm_city[j],"_env", " CASCADE;"))
   
-  dbSendQuery (con_pg, paste0("CREATE TABLE ", city$osm_city[j],"_env", " AS SELECT sid, st_envelope(st_buffer(geom, 500))::geometry('Polygon', 3857) AS geom FROM background_layer3
-                   where type =" ,"'", city$osm_city[j], "'", " and material=", "'", city$admin_level[j], "';"))
+  dbSendQuery(con_pg, paste0("CREATE TABLE ", city$osm_city[j],"_env", "  AS SELECT (row_number() OVER ())::int AS sid, relation_id::varchar(20), 'background'::varchar(30) AS feature, tags->>'name'::varchar(30)  AS type, tags ->> 'admin_level'::varchar(30) AS material, '' AS size, st_envelope(st_buffer(st_envelope(st_multi(st_buildarea(geom))), 500))::geometry(Polygon, 3857) AS geom  FROM boundaries WHERE tags->> 'boundary' IN ('administrative') AND tags->> 'name'=","'", city$osm_city[j],"'" , " AND tags ->> 'admin_level'=","'",city$admin_level[j], "';"))
   
   dbSendQuery(con_pg, paste0("ALTER TABLE ", city$osm_city[j],"_env", " ADD CONSTRAINT ", city$osm_city[j],"_env", "_pkey PRIMARY KEY (sid);"))
   
   dbSendQuery(con_pg, paste0("CREATE INDEX ", city$osm_city[j],"_env", "_geom_idx ON ", city$osm_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
   
+  
 }
+  
 
 
 #end.time <- Sys.time()
