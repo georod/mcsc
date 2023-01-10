@@ -18,24 +18,46 @@
 
 library(DBI)
 #library(dplyr)
-#library(RPostgreSQL)
 #library("RPostgres") 
 
 library(sf)
 library(terra)
 
+#=================================
+# Set folder & files paths
+#=================================
+
+# github project folder on server
+setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
+# project folder on desktop
+#setwd("~/github/mcsc/")
+
+# project output folder
+outF <- "projects/def-mfortin/georod/data/mcsc-proj/"
+
+city <- read.csv("~/misc/mcsc_city_list1.csv")
 
 #=================================
 # Connect to PG db
 #=================================
 # add username and pwd to .Renviron
+# local machine
+# con_pg <- DBI::dbConnect(
+#   drv = RPostgres::Postgres(),
+#   host = "localhost",
+#   port = 5432,
+#   #dbname = "osm",
+#   dbname = "georod_db_osm",
+#   user = Sys.getenv("username"),
+#   password = Sys.getenv("pwd")
+# )
+
+# Remote server. Thsi assumes this R script is running within the server
 con_pg <- DBI::dbConnect(
   drv = RPostgres::Postgres(),
-  host = "localhost",
+  host = "cedar-pgsql-vm",
   port = 5432,
-  dbname = "osm",
-  user = Sys.getenv("username"),
-  password = Sys.getenv("pwd")
+  dbname = "georod_db_osm"
 )
 
 
@@ -46,22 +68,23 @@ con_pg <- DBI::dbConnect(
 #====================================
 
 # List of city names found in OSM (OpenStreetMap)
-city <- c('Peterborough', 'Brantford') # 'Brantford'
-
+#city <- c('Peterborough', 'Brantford') # 'Brantford'
+city <- city[!is.na(city$admin_level),]
+#city <- city[1:3,]
 
 # Loop for creating city spatial envelopes
 
-for (j in 1:length(city)) {
+for (j in 1:nrow(city)) {
   
   
-  dbSendQuery(con_pg, paste0("DROP TABLE IF EXISTS ", city[j],"_env", " CASCADE;"))
+  dbSendQuery(con_pg, paste0("DROP TABLE IF EXISTS ", city$osm_city[j],"_env", " CASCADE;"))
   
-  dbSendQuery (con_pg, paste0("CREATE TABLE ",city[j],"_env", " AS SELECT sid, st_envelope(st_buffer(geom, 500))::geometry('Polygon', 3857) AS geom FROM background_layer3
-                   where type =" ,"'", city[j], "'", " and material='6'"))
+  dbSendQuery (con_pg, paste0("CREATE TABLE ", city$osm_city[j],"_env", " AS SELECT sid, st_envelope(st_buffer(geom, 500))::geometry('Polygon', 3857) AS geom FROM background_layer3
+                   where type =" ,"'", city$osm_city[j], "'", " and material=", "'", city$admin_level[j], "';"))
   
-  dbSendQuery(con_pg, paste0("ALTER TABLE ", city[j],"_env", " ADD CONSTRAINT ", city[j],"_env", "_pkey PRIMARY KEY (sid);"))
+  dbSendQuery(con_pg, paste0("ALTER TABLE ", city$osm_city[j],"_env", " ADD CONSTRAINT ", city$osm_city[j],"_env", "_pkey PRIMARY KEY (sid);"))
   
-  dbSendQuery(con_pg, paste0("CREATE INDEX ",city[j],"_env", "_geom_idx ON ", city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
+  dbSendQuery(con_pg, paste0("CREATE INDEX ", city$osm_city[j],"_env", "_geom_idx ON ", city$osm_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
   
 }
 
