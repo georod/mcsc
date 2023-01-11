@@ -29,22 +29,36 @@ library(sqldf)
 #=================================
 # Set folder & files paths
 #=================================
-setwd("~/mcsc_proj/")
+# github project folder on server
+setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
+# project folder on desktop
+#setwd("~/mcsc_proj/")
+
+# project output folder
+outF <- "~/projects/def-mfortin/georod/data/mcsc-proj/"
 
 
 #=================================
 # Connect to PG db
 #=================================
 # add username and pwd to .Renviron
+# con_pg <- DBI::dbConnect(
+#   drv = RPostgres::Postgres(),
+#   host = "localhost",
+#   port = 5432,
+#   dbname = "osm",
+#   user = Sys.getenv("username"),
+#   password = Sys.getenv("pwd")
+# )
+
+
+# Remote server. Thsi assumes this R script is running within the server
 con_pg <- DBI::dbConnect(
   drv = RPostgres::Postgres(),
-  host = "localhost",
+  host = "cedar-pgsql-vm",
   port = 5432,
-  dbname = "osm",
-  user = Sys.getenv("username"),
-  password = Sys.getenv("pwd")
+  dbname = "georod_db_osm"
 )
-
 
 
 #==================================
@@ -52,7 +66,7 @@ con_pg <- DBI::dbConnect(
 #==================================
 
 # Restore object (see urban_features_master_list_v1.R)
-df1 <- readRDS("df_unique_res.rds")
+df1 <- readRDS("./misc/df_unique_res.rds")
 
 # clean df so that feature names match SQL VIEWS
 df1$view <- ifelse(df1$view=='lf_roads', 'lf_roads_bf', df1$view)
@@ -80,9 +94,9 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 
 #largeMam[order(largeMam$priority, -largeMam$resistance),] 
 
-dim(largeMam)
-str(largeMam) 
-head(largeMam)
+#dim(largeMam)
+#str(largeMam) 
+#head(largeMam)
 
 #nrow(sqldf("SELECT distinct feature,type, priority, resistance, view from largeMam;")) # check for dups
 
@@ -91,7 +105,7 @@ head(largeMam)
 # Create rasters for each feature
 #===============================================
 
-city <- c('Peterborough')
+city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
 
 #city <- c('Peterborough', 'Brantford')
 
@@ -148,10 +162,10 @@ FROM
     rasterRes1 <- rasterize(vectorUrFts, raster1, field="resistance", background=NA, touches=FALSE,
                             update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
     
-    dir.create("rasters")
-    dir.create(paste0("rasters/",city[k]))
+    dir.create(paste0(outF,"rasters"))
+    dir.create(paste0(outF,"rasters/",city[k]))
     
-    writeRaster(rasterRes1, paste0("rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
+    writeRaster(rasterRes1, paste0(outF,"rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
   }
   
   
@@ -169,7 +183,7 @@ FROM
 
 # Read raster based on priority flag first, then stack, and collapse
 
-rasterFiles <- list.files(paste0("rasters/",city[k]), pattern='.tif$', full.names = TRUE)
+rasterFiles <- list.files(paste0(outF,"rasters/",city[k]), pattern='.tif$', full.names = TRUE)
 
 resVals <- sapply(strsplit(rasterFiles, "__"), "[", 3)
 resVals <- gsub(".tif", "", resVals)
@@ -189,8 +203,50 @@ r2 <- app(r1, fun='first', na.rm=TRUE)
 
 r3 <- subst(r2, NA, 50)
 
-dir.create(paste0("rasters/",city[k],"/output"))
-writeRaster(r3, paste0("rasters/",city[k],"/output/",'urban_features.tif'), overwrite=TRUE)
+dir.create(paste0(outF,"rasters/",city[k],"/output"))
+writeRaster(r3, paste0(outF,"rasters/",city[k],"/output/",'urban_features.tif'), overwrite=TRUE)
+
+#==========
+# New part
+#==========
+
+#r3 <- rast("C:\\Users\\Peter R\\Documents\\rasters\\urban_features.tif")
+
+r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
+
+cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
+
+# Crop North AMerica land cover map first
+
+#cat(crs(r4), "\n")
+
+#ext1 <- ext(r3)
+#ext1 <- as.polygons(ext(r3))
+#crs(ext1) <- "EPSG:3857"
+ext1 <- buffer(vectorEnv, width=500)
+newcrs <- crs(r4, proj=TRUE)
+# Project to North America projection
+ext1Pj <- terra::project(ext1, newcrs)
+# Crop NA land cover 
+r5 <- crop(r4, ext1Pj)
+
+# transform tp EPSG 3857 , "EPSG:3857"
+r6 <- project(r5, r3, method="near", align=TRUE)
+r6 <- crop(r6, r3)
+#plot(r6, type="classes")
+r7 <- mask(r6, r3, inverse=TRUE, maskvalue=NA)
+
+rclM <- as.matrix(cecRes[,c(3,5)])
+rclM <- matrix(rclM, ncol=2, byrow=TRUE)
+r8 <- classify(r7, rclM)
+plot(r8, type="classes")
+
+
+r9 <- cover(r3, r8)
+plot(r9, type="classes")
+writeRaster(r9, paste0(outF,"rasters/",city[k],"/output/",'all_features.tif'), overwrite=TRUE)
+
+
 
 # disconnect from db
 dbDisconnect(con_pg)
