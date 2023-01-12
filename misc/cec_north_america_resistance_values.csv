@@ -7,12 +7,12 @@ description,rgb,value,mcsc_class,resistance
  Mixed forest, RGB 92 117 43,6,dense_green_area,5
  Tropical or sub-tropical shrubland, RGB 179 158 43,7,hetero_green_area,10
  Temperate or sub-polar shrubland, RGB 179 138 51,8,hetero_green_area,10
- Tropical or sub-tropical grassland, RGB 232 220 94,9,open_green_area,10
- Temperate or sub-polar grassland, RGB 225 207 138,10,open_green_area,10
+ Tropical or sub-tropical grassland, RGB 232 220 94,9,open_green_area,20
+ Temperate or sub-polar grassland, RGB 225 207 138,10,open_green_area,20
  Sub-polar or polar shrubland-lichen-moss, RGB 156 117 84,11,open_green_area,20
  Sub-polar or polar grassland-lichen-moss, RGB 186 212 143,12,open_green_area,20
  Sub-polar or polar barren-lichen-moss, RGB 64 138 112,13,open_green_area,20
- Wetland, RGB 107 163 138,14,hetero_green_area,20
+ Wetland, RGB 107 163 138,14,hetero_green_area,10
  Cropland, RGB 230 174 102,15,resourceful_green_area,10
  Barren lands, RGB 168 171 174,16,open_green_area,20
  Urban, RGB 220 33 38,17,residential,35

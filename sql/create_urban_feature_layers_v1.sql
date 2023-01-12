@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2022-12-19
+-- 2023-01-12
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -32,6 +32,7 @@ WHEN size = '2;3' THEN '2'
 WHEN size = '10' THEN '1'
 WHEN size = '1; 2' THEN '1'
 WHEN size = '1;2' THEN '1'
+WHEN size = '1,5' THEN '1.5'
 ELSE size
 END::numeric(3,1) AS size, (geom)::geometry(LineString, 3857) AS geom
 FROM
@@ -52,12 +53,37 @@ SELECT way_id,
 	) t2
 	;
 
-DROP VIEW IF EXISTS lf_roads_bf;
+-- 2023-01-11: Peter created a table of this query to speed up processing. No need to run this for now.
+/* DROP VIEW IF EXISTS lf_roads_bf;
 CREATE OR REPLACE VIEW lf_roads_bf AS
---roads
-(SELECT sid, way_id as osm_id, feature, type, material, size::varchar(10), 13::smallint AS priority, 
- st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom FROM lf_roads
-);
+SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+FROM
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+CASE
+WHEN size is null THEN '1'
+WHEN size = '' THEN '1'
+WHEN size = '0' THEN '1'
+ELSE size
+END::numeric(3,1) AS size, geom 
+FROM
+(
+SELECT way_id, feature, type, material,
+REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size , (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id,  
+	'linear_feature' AS feature,
+	tags->>'highway' AS type,
+	tags->>'surface' AS material,
+	tags ->> 'lanes' AS size,
+	geom AS geom
+    FROM lines WHERE tags->>'highway' <>'' or tags ->> 'highway' IN ('residential','footway', 'primary', 'motorway', 'secondary')
+		) t1
+	) t2
+	) t3
+	; */
 
 
 DROP VIEW IF EXISTS lf_rails;
@@ -90,9 +116,35 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_rails_bf;
 CREATE OR REPLACE VIEW lf_rails_bf AS
-(SELECT sid, way_id as osm_id, feature, type, material, size::varchar(10), 15::smallint AS priority, 
- st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom FROM lf_rails
-);
+SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6))::geometry('MultiPolygon', 3857) AS geom  
+FROM
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+CASE
+WHEN size is null THEN '1'
+WHEN size = '' THEN '1'
+WHEN size = '0' THEN '1'
+ELSE 1
+END::numeric(3,1) AS size, (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id, feature, type, material,
+	REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size, geom
+FROM
+(
+SELECT way_id,  
+	'linear_feature_rail' AS feature,
+	tags->>'railway' AS type,
+	'' AS material,
+	'' AS size,
+	geom  AS geom
+    FROM lines WHERE tags->>'railway' NOT IN ('monorail','funicular','subway') or tags->> 'landuse' = 'railway'
+		) t1
+	) t2
+	) t3
+	;
+	
 
 
 DROP VIEW IF EXISTS open_green;
@@ -208,8 +260,24 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 
 DROP VIEW IF EXISTS barrier_bf;
 CREATE OR REPLACE VIEW barrier_bf AS	
-(SELECT sid, way_id as osm_id, feature, type, material, size, 14::smallint AS priority, st_multi(st_buffer(geom, 1))::geometry('MultiPolygon', 3857) AS geom FROM barrier
-);
+SELECT sid, way_id, feature, type, material,  size, st_multi(st_buffer(geom, 1))::geometry('MultiPolygon', 3857) AS geom
+FROM
+(
+SELECT sid, way_id, feature, type, material, 
+
+REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size, geom
+FROM
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),  
+	'barrier'::varchar(30) AS feature,
+	tags->>'barrier'::varchar(30)  AS type,
+	tags->>'fence_type'::varchar(30) AS material,
+	tags->>'height'::varchar(30) AS size,
+	geom AS geom
+    FROM lines WHERE tags->>'barrier'<>''
+	) t1
+	) t2
+	;
 
 
 DROP VIEW IF EXISTS landuse_park;

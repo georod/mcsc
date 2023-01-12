@@ -35,7 +35,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("~/mcsc_proj/")
 
 # project output folder
-outF <- "~/projects/def-mfortin/georod/data/mcsc-proj/"
+outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/"
 
 
 #=================================
@@ -71,16 +71,17 @@ df1 <- readRDS("./misc/df_unique_res.rds")
 # clean df so that feature names match SQL VIEWS
 df1$view <- ifelse(df1$view=='lf_roads', 'lf_roads_bf', df1$view)
 df1$view <- ifelse(df1$view=='lf_rails', 'lf_rails_bf', df1$view)
- 
+df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
+
 # select relevant columns
 df1 <- df1[,c(1,2,4,5, 7, 8)] 
 # remove duplicates 
 df1 <- df1[!duplicated(df1), ] 
- 
+
 resVals <- df1
 
-str(resVals) 
-head(resVals)
+#str(resVals) 
+#head(resVals)
 
 # large_mammals
 largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:5)]
@@ -105,28 +106,23 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 # Create rasters for each feature
 #===============================================
 
-city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
+city <- c('City_of_New_York', 'Chicago')
+#city <- c('Fort_Collins')
+#city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
 
 #city <- c('Peterborough', 'Brantford')
 
-
 featUrb <- unique(largeMam$view)
 
-for (i in 1:length(featUrb)) {
+for (k in 1:length(city)) {
   
-  vals <- sqldf(paste0("SELECT distinct priority, resistance FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, resistance;"))
-  
-  for (j in 1:nrow(vals)) { 
+  for (i in 1:length(featUrb)) {  
     
-    sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, resistance, view FROM largeMam WHERE view='",featUrb[i],"' AND priority=",vals$priority[j], " AND resistance=", vals$resistance[j], " ORDER BY resistance;"))
-
-    # _bf (buffer) is a flag to remind us that we are converting the linear feat. ti polygons    
-    if(featUrb[i] %in% (c("lf_roads", "lf_rails", "barrier"))) {
-      sqlPrimer$view <- gsub(featUrb[i], paste0(featUrb[i],"_bf"), sqlPrimer$view) 
-      }
+    vals <- sqldf(paste0("SELECT distinct priority, resistance FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, resistance;"))
+    
+    for (j in 1:nrow(vals)) {
       
-    
-    for (k in 1:length(city)) {
+      sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, resistance, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND resistance=", vals$resistance[j], " ORDER BY resistance;"))
       
       
       queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
@@ -140,7 +136,7 @@ FROM
   
   #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
   paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-    
+  
   
   ") t1
   JOIN
@@ -153,7 +149,9 @@ FROM
   
   #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
   
-  vectorUrFts <- vect(st_read(con_pg, query=queryUrFts)) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
+  vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
+  
+  if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
   
   if( length(vectorUrFts)==0) 
   { print("empty vector")} else
@@ -166,15 +164,23 @@ FROM
     dir.create(paste0(outF,"rasters/",city[k]))
     
     writeRaster(rasterRes1, paste0(outF,"rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
+    
   }
-  
   
     }
     
   }
   
+  
 }
 
+# disconnect from db
+dbDisconnect(con_pg)
+
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+time.taken
 
 
 #=========================
@@ -199,9 +205,10 @@ priOrd$order <- 1:nrow(priOrd)
 
 r1 <- rast(priOrd$rasterFiles)
 
-r2 <- app(r1, fun='first', na.rm=TRUE)
+r3 <- app(r1, fun='first', na.rm=TRUE)
 
-r3 <- subst(r2, NA, 50)
+#r3 <- subst(r2, NA, 50)
+#r3 <- r2
 
 dir.create(paste0(outF,"rasters/",city[k],"/output"))
 writeRaster(r3, paste0(outF,"rasters/",city[k],"/output/",'urban_features.tif'), overwrite=TRUE)
@@ -210,40 +217,42 @@ writeRaster(r3, paste0(outF,"rasters/",city[k],"/output/",'urban_features.tif'),
 # New part
 #==========
 
-#r3 <- rast("C:\\Users\\Peter R\\Documents\\rasters\\urban_features.tif")
 
 r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
 
 cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 
-# Crop North AMerica land cover map first
-
-#cat(crs(r4), "\n")
+# Crop North America land cover map first
 
 #ext1 <- ext(r3)
 #ext1 <- as.polygons(ext(r3))
 #crs(ext1) <- "EPSG:3857"
+
+# Get extent of city envelope
 ext1 <- buffer(vectorEnv, width=500)
+# Get crs of N. America raster
 newcrs <- crs(r4, proj=TRUE)
-# Project to North America projection
+# Project to North America raster projection
 ext1Pj <- terra::project(ext1, newcrs)
-# Crop NA land cover 
+# Crop NA land cover to city envelope extent
 r5 <- crop(r4, ext1Pj)
 
-# transform tp EPSG 3857 , "EPSG:3857"
+# transform cropped raster crs to EPSG 3857 , "EPSG:3857"
 r6 <- project(r5, r3, method="near", align=TRUE)
+# crop to ensure rasters have the same extent
 r6 <- crop(r6, r3)
 #plot(r6, type="classes")
+# Mask raster
 r7 <- mask(r6, r3, inverse=TRUE, maskvalue=NA)
 
 rclM <- as.matrix(cecRes[,c(3,5)])
 rclM <- matrix(rclM, ncol=2, byrow=TRUE)
 r8 <- classify(r7, rclM)
-plot(r8, type="classes")
+#plot(r8, type="classes")
 
 
 r9 <- cover(r3, r8)
-plot(r9, type="classes")
+#plot(r9, type="classes")
 writeRaster(r9, paste0(outF,"rasters/",city[k],"/output/",'all_features.tif'), overwrite=TRUE)
 
 
