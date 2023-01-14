@@ -105,8 +105,8 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 #===============================================
 # Create rasters for each feature
 #===============================================
-
-city <- c('City_of_New_York')
+city <- c('Chicago')
+#city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
 #city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
@@ -114,7 +114,7 @@ city <- c('City_of_New_York')
 #city <- c('Peterborough', 'Brantford')
 
 featUrb <- unique(largeMam$view)
-featUrb <- featUrb[c(9:14)]
+#featUrb <- featUrb[c(9:14)]
 
 
 for (k in 1:length(city)) {
@@ -255,6 +255,7 @@ r8 <- classify(r7, rclM)
 
 
 r9 <- cover(r3, r8)
+#r9 <- subst(r9, 0, 100)
 #plot(r9, type="classes")
 writeRaster(r9, paste0(outF,"rasters/",city[k],"/output/",'all_features.tif'), overwrite=TRUE)
 
