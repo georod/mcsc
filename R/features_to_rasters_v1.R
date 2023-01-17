@@ -248,14 +248,14 @@ r6 <- crop(r6, r3)
 # Mask raster
 r7 <- mask(r6, r3, inverse=TRUE, maskvalue=NA)
 
-rclM <- as.matrix(cecRes[,c(3,5)], byrow=TRUE)
+rclM <- as.matrix(cecRes[,c(3,5)])
 #rclM <- matrix(rclM, ncol=2, byrow=TRUE)
 r8 <- classify(r7, rclM)
 #plot(r8, type="classes")
 
 
 r9 <- cover(r3, r8)
-#r9 <- subst(r9, 0, 100)
+r9 <- subst(r9, 0, 100)
 #plot(r9, type="classes")
 writeRaster(r9, paste0(outF,"rasters/",city[k],"/output/",'all_features.tif'), overwrite=TRUE)
 
