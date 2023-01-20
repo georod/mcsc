@@ -35,7 +35,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("~/github/mcsc/")
 
 # project output folder
-outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/"
+outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
 
 
 #=================================
@@ -102,18 +102,20 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 #nrow(sqldf("SELECT distinct feature,type, priority, resistance, view from largeMam;")) # check for dups
 
 
+
 #===============================================
 # Create rasters for each feature
 #===============================================
-city <- c('Chicago')
-#city <- c('City_of_New_York')
+#city <- c('Chicago')
+city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
 #city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
 
 #city <- c('Peterborough', 'Brantford')
 
-featUrb <- unique(largeMam$view)
+#featUrb <- unique(largeMam$view)
+featUrb <- unique(smallMam$view)
 #featUrb <- featUrb[c(9:14)]
 
 
