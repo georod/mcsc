@@ -1,16 +1,26 @@
-﻿osm_city,admin_level
-Atlanta,4
-Berkeley,8
-Boston,8
-Chicago,8
-Fort Worth,8
-Edmonton,6
-Fort Collins,8
-Freiburg im Breisgau,6
-Houston,8
-Little Rock,8
-Manchester,8
-City of New York,5
-Pasadena,8
-Phoenix,8
-Pomona,8
+city,osm_city_name,admin_level,osm_id
+Atlanta,Atlanta,4,119557
+"Berkeley, CA",Berkeley,8,2833528
+"Boston, MA",Boston,8,2315704
+Chicago,Chicago,8,122604
+DFW,Fort Worth,8,115274
+Edmonton,Edmonton,6,2564500
+Fort Collins,Fort Collins,8,112524
+Freiburg,Freiburg im Breisgau,6,62768
+Houston,Houston,8,2688911
+Little Rock,Little Rock,8,111147
+Manchester,Manchester,8,305467
+"National Capital Area, Maryland",??,,
+New York,City of New York,5,175905
+Pasadena,Pasadena,8,3529725
+Phoenix,Phoenix,8,111257
+Pomona,Pomona,8,1532363
+Salt Lake City,,,198770
+"Saskatoon",,,4189345
+St. Louis,,,1180533
+Syracuse,,,174916
+Vancouver,,,1852574
+Wilmington,,,369472
+Edmonton,,,2564500
+Toronto,Toronto,6,324211
+Urbana,,,126133
