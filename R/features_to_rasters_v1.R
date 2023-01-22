@@ -35,7 +35,8 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("~/github/mcsc/")
 
 # project output folder
-outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
+#outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
+outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/largemam/"
 
 
 #=================================
@@ -106,16 +107,17 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 #===============================================
 # Create rasters for each feature
 #===============================================
+city <- c('Toronto')
 #city <- c('Chicago')
-city <- c('City_of_New_York')
+#city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
 #city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
 
 #city <- c('Peterborough', 'Brantford')
 
-#featUrb <- unique(largeMam$view)
-featUrb <- unique(smallMam$view)
+featUrb <- unique(largeMam$view)
+#featUrb <- unique(smallMam$view)
 #featUrb <- featUrb[c(9:14)]
 
 
