@@ -9,6 +9,7 @@
 #  Main aim: convert urban features to rasters
 
 start.time <- Sys.time()
+start.time
 
 #===================
 # Libraries
@@ -107,7 +108,7 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 #===============================================
 # Create rasters for each feature
 #===============================================
-city <- c('Toronto')
+city <- c('Toronto', 'City_of_New_York', 'Chicago') # Fort_Collins was done separately
 #city <- c('Chicago')
 #city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
@@ -121,79 +122,81 @@ featUrb <- unique(largeMam$view)
 #featUrb <- featUrb[c(9:14)]
 
 
-for (k in 1:length(city)) {
-  
-  for (i in 1:length(featUrb)) {  
-    
-    vals <- sqldf(paste0("SELECT distinct priority, resistance FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, resistance;"))
-    
-    for (j in 1:nrow(vals)) {
-      
-      sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, resistance, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND resistance=", vals$resistance[j], " ORDER BY resistance;"))
-      
-      
-      queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
-      
-      # the [1] could be removed if there are no dups  
-      queryUrFts <-paste0("SELECT ", sqlPrimer$resistance[1]," as resistance, geom 
-FROM
-(
-  SELECT (ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('Polygon', 3857) AS geom
-    FROM (", 
-  
-  #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-  paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-  
-  
-  ") t1
-  JOIN
-   ", city[k],"_env", " t2
-  ON st_intersects(t1.geom,t2.geom)) t3;")  
-  
-  vectorEnv <- vect(st_read(con_pg, query=queryEnv))
-  
-  raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
-  
-  #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
-  
-  vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
-  
-  if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
-  
-  if( length(vectorUrFts)==0) 
-  { print("empty vector")} else
-    
-  { 
-    rasterRes1 <- rasterize(vectorUrFts, raster1, field="resistance", background=NA, touches=FALSE,
-                            update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
-    
-    dir.create(paste0(outF,"rasters"))
-    dir.create(paste0(outF,"rasters/",city[k]))
-    
-    writeRaster(rasterRes1, paste0(outF,"rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
-    
-  }
-  
-    }
-    
-  }
-  
-  
-}
+# for (k in 1:length(city)) {
+#   
+#   for (i in 1:length(featUrb)) {  
+#     
+#     vals <- sqldf(paste0("SELECT distinct priority, resistance FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, resistance;"))
+#     
+#     for (j in 1:nrow(vals)) {
+#       
+#       sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, resistance, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND resistance=", vals$resistance[j], " ORDER BY resistance;"))
+#       
+#       
+#       queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
+#       
+#       # the [1] could be removed if there are no dups  
+#       queryUrFts <-paste0("SELECT ", sqlPrimer$resistance[1]," as resistance, geom 
+# FROM
+# (
+#   SELECT (ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('Polygon', 3857) AS geom
+#     FROM (", 
+#   
+#   #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
+#   paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
+#   
+#   
+#   ") t1
+#   JOIN
+#    ", city[k],"_env", " t2
+#   ON st_intersects(t1.geom,t2.geom)) t3;")  
+#   
+#   vectorEnv <- vect(st_read(con_pg, query=queryEnv))
+#   
+#   raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
+#   
+#   #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
+#   
+#   vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
+#   
+#   if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
+#   
+#   if( length(vectorUrFts)==0) 
+#   { print("empty vector")} else
+#     
+#   { 
+#     rasterRes1 <- rasterize(vectorUrFts, raster1, field="resistance", background=NA, touches=FALSE,
+#                             update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
+#     
+#     dir.create(paste0(outF,"rasters"))
+#     dir.create(paste0(outF,"rasters/",city[k]))
+#     
+#     writeRaster(rasterRes1, paste0(outF,"rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
+#     
+#   }
+#   
+#     }
+#     
+#   }
+#   
+#   
+# }
 
 # disconnect from db
-dbDisconnect(con_pg)
+#dbDisconnect(con_pg)
 
 
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-time.taken
+#end.time <- Sys.time()
+#time.taken <- end.time - start.time
+#time.taken
 
 
 #=========================
 # Stack & collapse rasters
 #=========================
 
+
+for (k in 1:length(city)) {
 # Read raster based on priority flag first, then stack, and collapse
 
 rasterFiles <- list.files(paste0(outF,"rasters/",city[k]), pattern='.tif$', full.names = TRUE)
@@ -220,6 +223,9 @@ r3 <- app(r1, fun='first', na.rm=TRUE)
 dir.create(paste0(outF,"rasters/",city[k],"/output"))
 writeRaster(r3, paste0(outF,"rasters/",city[k],"/output/",'urban_features.tif'), overwrite=TRUE)
 
+}
+
+
 #==========
 # New part
 #==========
@@ -235,6 +241,11 @@ cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 #ext1 <- as.polygons(ext(r3))
 #crs(ext1) <- "EPSG:3857"
 
+for (k in 1:length(city)) {
+  
+queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
+vectorEnv <- vect(st_read(con_pg, query=queryEnv))
+
 # Get extent of city envelope
 ext1 <- buffer(vectorEnv, width=500)
 # Get crs of N. America raster
@@ -244,6 +255,8 @@ ext1Pj <- terra::project(ext1, newcrs)
 # Crop NA land cover to city envelope extent
 r5 <- crop(r4, ext1Pj)
 
+r3 <- rast(paste0(outF,"rasters/",city[k],"/output/",'urban_features.tif'))
+
 # transform cropped raster crs to EPSG 3857 , "EPSG:3857"
 r6 <- project(r5, r3, method="near", align=TRUE)
 # crop to ensure rasters have the same extent
@@ -252,7 +265,7 @@ r6 <- crop(r6, r3)
 # Mask raster
 r7 <- mask(r6, r3, inverse=TRUE, maskvalue=NA)
 
-rclM <- as.matrix(cecRes[,c(3,5)])
+rclM <- as.matrix(cecRes[,c(3,5)]) # 6 for lcrasters
 #rclM <- matrix(rclM, ncol=2, byrow=TRUE)
 r8 <- classify(r7, rclM)
 #plot(r8, type="classes")
@@ -263,6 +276,7 @@ r9 <- subst(r9, 0, 100)
 #plot(r9, type="classes")
 writeRaster(r9, paste0(outF,"rasters/",city[k],"/output/",'all_features.tif'), overwrite=TRUE)
 
+}
 
 
 # disconnect from db
