@@ -36,6 +36,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("~/github/mcsc/")
 
 # project output folder
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test2/"
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
 outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/largemam/"
 
@@ -114,7 +115,7 @@ city <- c('Toronto', 'City_of_New_York', 'Chicago') # Fort_Collins was done sepa
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
 #city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
-
+#city <- c('Peterborough')
 #city <- c('Peterborough', 'Brantford')
 
 featUrb <- unique(largeMam$view)
@@ -122,65 +123,65 @@ featUrb <- unique(largeMam$view)
 #featUrb <- featUrb[c(9:14)]
 
 
-# for (k in 1:length(city)) {
-#   
-#   for (i in 1:length(featUrb)) {  
-#     
-#     vals <- sqldf(paste0("SELECT distinct priority, resistance FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, resistance;"))
-#     
-#     for (j in 1:nrow(vals)) {
-#       
-#       sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, resistance, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND resistance=", vals$resistance[j], " ORDER BY resistance;"))
-#       
-#       
-#       queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
-#       
-#       # the [1] could be removed if there are no dups  
-#       queryUrFts <-paste0("SELECT ", sqlPrimer$resistance[1]," as resistance, geom 
-# FROM
-# (
-#   SELECT (ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('Polygon', 3857) AS geom
-#     FROM (", 
-#   
-#   #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-#   paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-#   
-#   
-#   ") t1
-#   JOIN
-#    ", city[k],"_env", " t2
-#   ON st_intersects(t1.geom,t2.geom)) t3;")  
-#   
-#   vectorEnv <- vect(st_read(con_pg, query=queryEnv))
-#   
-#   raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
-#   
-#   #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
-#   
-#   vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
-#   
-#   if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
-#   
-#   if( length(vectorUrFts)==0) 
-#   { print("empty vector")} else
-#     
-#   { 
-#     rasterRes1 <- rasterize(vectorUrFts, raster1, field="resistance", background=NA, touches=FALSE,
-#                             update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
-#     
-#     dir.create(paste0(outF,"rasters"))
-#     dir.create(paste0(outF,"rasters/",city[k]))
-#     
-#     writeRaster(rasterRes1, paste0(outF,"rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
-#     
-#   }
-#   
-#     }
-#     
-#   }
-#   
-#   
-# }
+for (k in 1:length(city)) {
+
+  for (i in 1:length(featUrb)) {
+
+    vals <- sqldf(paste0("SELECT distinct priority, resistance FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, resistance;"))
+
+    for (j in 1:nrow(vals)) {
+
+      sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, resistance, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND resistance=", vals$resistance[j], " ORDER BY resistance;"))
+
+
+      queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
+
+      # the [1] could be removed if there are no dups
+      queryUrFts <-paste0("SELECT ", sqlPrimer$resistance[1]," as resistance, geom
+FROM
+(
+  SELECT (ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('Polygon', 3857) AS geom
+    FROM (",
+
+  #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
+  paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
+
+
+  ") t1
+  JOIN
+   ", city[k],"_env", " t2
+  ON st_intersects(t1.geom,t2.geom)) t3;")
+
+  vectorEnv <- vect(st_read(con_pg, query=queryEnv))
+
+  raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
+
+  #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
+
+  vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
+
+  if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
+
+  if( length(vectorUrFts)==0)
+  { print("empty vector")} else
+
+  {
+    rasterRes1 <- rasterize(vectorUrFts, raster1, field="resistance", background=NA, touches=FALSE,
+                            update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
+
+    dir.create(paste0(outF,"rasters"))
+    dir.create(paste0(outF,"rasters/",city[k]))
+
+    writeRaster(rasterRes1, paste0(outF,"rasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$resistance[1],".tif"), overwrite=TRUE)
+
+  }
+
+    }
+
+  }
+
+
+}
 
 # disconnect from db
 #dbDisconnect(con_pg)
@@ -226,11 +227,12 @@ writeRaster(r3, paste0(outF,"rasters/",city[k],"/output/",'urban_features.tif'),
 }
 
 
-#==========
-# New part
-#==========
+#=================================
+# Fill in with Land cover raster
+#=================================
 
-
+#local test raster
+#r4 <- rast("C:/Users/Peter R/Documents/data/ont_Red.tif")
 r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
 
 cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
