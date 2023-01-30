@@ -73,12 +73,12 @@ con_pg <- DBI::dbConnect(
 df1 <- readRDS("./misc/df_unique_res.rds")
 
 # clean df so that feature names match SQL VIEWS
-df1$view <- ifelse(df1$view=='lf_roads', 'lf_roads_bf', df1$view)
-df1$view <- ifelse(df1$view=='lf_rails', 'lf_rails_bf', df1$view)
-df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
+#df1$view <- ifelse(df1$view=='lf_roads', 'lf_roads_bf', df1$view)
+#df1$view <- ifelse(df1$view=='lf_rails', 'lf_rails_bf', df1$view)
+#df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
 
 # select relevant columns
-df1 <- df1[,c(1,2,4,5, 7, 8, 9)] 
+df1 <- df1[,c(1,2,4,6, 7, 8, 9)] 
 # remove duplicates 
 df1 <- df1[!duplicated(df1), ] 
 
@@ -88,14 +88,14 @@ resVals <- df1
 #head(resVals)
 
 # large_mammals
-largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:5, 7)]
+largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:4, 6, 7)]
 
 # small_mammals
-smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:4, 6,7)]
+smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:3, 5,6,7)]
 
-names(largeMam) <- c("feature","type","priority", "view", "resistance", "class")
+names(largeMam) <- c("feature","type", "view", "resistance", "priority", "class")
 
-names(smallMam) <- c("feature","type","priority", "view", "resistance", "class")
+names(smallMam) <- c("feature","type", "view", "resistance", "priority", "class")
 
 #largeMam[order(largeMam$priority, -largeMam$resistance),] 
 
@@ -120,6 +120,7 @@ city <- c('Toronto', 'City_of_New_York', 'Chicago') #  'Fort_Collins' was done s
 #city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
 #city <- c('Peterborough')
 #city <- c('Peterborough', 'Brantford')
+#city <- c('Peterborough')
 
 featUrb <- unique(largeMam$view) 
 #featUrb <- unique(smallMam$view)

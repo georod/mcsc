@@ -1,0 +1,38 @@
+highway tag,categorization,lanes
+raceway,building,0
+corridor,exclude,0
+elevator,exclude,0
+platform,exclude,0
+crossing,exclude,0
+proposed,exclude,0
+proposed,exclude,0
+razed,exclude,0
+tertiary,"high traffic, high speed",6
+tertiary_link,"high traffic, high speed",6
+secondary,"high traffic, medium speed",4
+secondary_link,"high traffic, medium speed",4
+residential,low traffic,2
+rest_area,low traffic,2
+primary,medium traffic,2
+construction,no traffic,0.5
+escape,no traffic,0.5
+cycleway,no traffic,0.5
+steps,no traffic,0.5
+bridleway,no traffic,0.5
+construction,no traffic,0.5
+path,no traffic,0.5
+pedestrian,no traffic,0.5
+track,no traffic,0.5
+abandoned,no traffic,0.5
+footway,no traffic,0.5
+footway = sidewalk,no traffic,0.5
+road,unclassified,2
+unclassified,unclassified,2
+motorway_link,very high traffic,4
+motorway,very high traffic,4
+trunk_link,very high traffic,4
+trunk,very high traffic,4
+turning_loop,very low traffic,1.5
+living_street,very low traffic,1.5
+services,very very low traffic,1
+service,very very low traffic,1

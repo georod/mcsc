@@ -96,7 +96,7 @@ df_unique_res  <- df_unique_res %>% rename(res_large_mammals = resistance, res_s
 df_unique_res  <- df_unique_res %>% filter(feature != 'background')
 
 ##check 
-check <- df_unique_res %>% count(feature, priority, res_large_mammals, res_small_mammals)
+#check <- df_unique_res %>% count(feature, priority, res_large_mammals, res_small_mammals)
 ##footway in commercial_industrial
 #View(check)
 
