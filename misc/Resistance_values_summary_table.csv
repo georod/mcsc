@@ -1,0 +1,56 @@
+Description,resistance_lm,resistance_sm,mcsc_value
+water,100,no_diff,25
+open_green_area,15,no_diff,6
+hetero_green_area,10,no_diff,7
+resourceful_green_area,10,no_diff,5
+dense_green_area,5,no_diff,8
+residential,40,30,4
+institutional,35,30,3
+"commercial_industrial & type %in% c('commercial','retail')",50,no_diff,2
+commercial_industrial & type ==industrial,70,no_diff,1
+barrier,70,no_diff,24
+building,100,no_diff,10
+parking_surface,20,30,9
+linear_feature_rail,15,no_diff,23
+"linear_feature_rail& type %in% c('abandoned','disused','construction')",10,no_diff,22
+linear_feature_rail& type %in% c('tram'),45,no_diff,21
+linear_feature_rail& type %in% c('station'),100,no_diff,10
+linear_feature_no_traffic& material != 'sidewalk',15,no_diff,11
+linear_feature_no_traffic& material == 'sidewalk',20,no_diff,19
+linear_feature_vvl_traffic,25,no_diff,12
+linear_feature_vl_traffic,30,40,13
+linear_feature_l_traffic,35,50,14
+linear_feature_m_traffic,40,65,16
+linear_feature_h_traffic_ls,45,70,17
+linear_feature_h_traffic_hs,50,80,18
+linear_feature_vh_traffic,80,95,20
+linear_feature_na_traffic,35,no_diff,15
+,,,
+,,,
+,,,
+ water,25, priority)) %>%,
+ barrier,24, priority))%>%,
+ parking_surface,9, priority))%>%,
+ residential,4, priority))%>%,
+ institutional,3, priority))%>%,
+ open_green_area,6, priority))%>%,
+ hetero_green_area,7, priority))%>%,
+ dense_green_area,8, priority))%>%,
+ resourceful_green_area,5, priority))%>%  ,
+ commercial_industrial & type ==retail,2, priority)) %>%,
+ commercial_industrial & type ==industrial,1, priority)) %>%,
+ building,10, priority))%>%,
+ linear_feature_rail,23, priority))%>%,
+ linear_feature_rail& type %in% c('abandoned',22, priority))%>%,
+ linear_feature_rail& type %in% c('tram'),21, priority))%>%,
+ linear_feature_rail& type %in% c('station'),10, priority))%>%,
+ linear_feature_no_traffic& material != 'sidewalk',11, priority))%>%,
+ linear_feature_no_traffic& material == 'sidewalk',19, priority))%>%,
+ linear_feature_vvl_traffic,12, priority))%>%,
+ linear_feature_vl_traffic,13, priority))%>%,
+ linear_feature_l_traffic,14, priority))%>%,
+ linear_feature_m_traffic,16, priority))%>%,
+ linear_feature_h_traffic_ls,17, priority))%>%,
+ linear_feature_h_traffic_hs,18, priority))%>%,
+ linear_feature_vh_traffic,20, priority))%>%,
+ linear_feature_na_traffic,15, priority))%>%,
