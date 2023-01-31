@@ -88,7 +88,7 @@ resVals <- df1
 #head(resVals)
 
 # large_mammals (Only need to create land cover with largeMam or smallMam but not both as they both have the same class values)
-largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:5)]
+largeMam <- resVals[!is.na(resVals$priority),c(1:5)]
 
 # small_mammals
 #smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:4, 6)]
