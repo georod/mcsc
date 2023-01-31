@@ -77,7 +77,7 @@ df1 <- readRDS("./misc/df_unique_res.rds")
 #df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
 
 # select relevant columns
-df1 <- df1[,c(1,2,4,5, 7, 8)] 
+df1 <- df1[,c(1,2,4,6, 7, 8)] 
 # remove duplicates 
 df1 <- df1[!duplicated(df1), ] 
 
@@ -92,9 +92,9 @@ largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:5)]
 # small_mammals
 smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:4, 6)]
 
-names(largeMam) <- c("feature","type","priority", "view", "resistance")
+names(largeMam) <- c("feature","type", "view", "resistance", "priority")
 
-names(smallMam) <- c("feature","type","priority", "view", "resistance")
+names(smallMam) <- c("feature","type", "view", "resistance", "priority")
 
 #largeMam[order(largeMam$priority, -largeMam$resistance),] 
 
@@ -109,7 +109,8 @@ names(smallMam) <- c("feature","type","priority", "view", "resistance")
 #===============================================
 # Create rasters for each feature
 #===============================================
-city <- c('Toronto', 'City_of_New_York', 'Chicago') # Fort_Collins was done separately
+city <- c('Toronto')
+#city <- c('Toronto', 'City_of_New_York', 'Chicago') # Fort_Collins was done separately
 #city <- c('Chicago')
 #city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
