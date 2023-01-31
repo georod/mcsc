@@ -78,7 +78,7 @@ df1 <- readRDS("./misc/df_unique_res.rds")
 #df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
 
 # select relevant columns
-df1 <- df1[,c(1,2,4,6, 7, 8, 9)] 
+df1 <- df1[,c(1,2,4,5,9)] 
 # remove duplicates 
 df1 <- df1[!duplicated(df1), ] 
 
@@ -87,15 +87,15 @@ resVals <- df1
 #str(resVals) 
 #head(resVals)
 
-# large_mammals
-largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:4, 6, 7)]
+# large_mammals (Only need to create land cover with largeMam or smallMam but not both as they both have the same class values)
+largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:5)]
 
 # small_mammals
-smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:3, 5,6,7)]
+#smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:4, 6)]
 
-names(largeMam) <- c("feature","type", "view", "resistance", "priority", "class")
+names(largeMam) <- c("feature","type", "priority", "view", "class")
 
-names(smallMam) <- c("feature","type", "view", "resistance", "priority", "class")
+#names(smallMam) <- c("feature","type", "view", "resistance", "priority", "class")
 
 #largeMam[order(largeMam$priority, -largeMam$resistance),] 
 

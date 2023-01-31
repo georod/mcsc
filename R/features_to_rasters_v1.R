@@ -72,9 +72,9 @@ con_pg <- DBI::dbConnect(
 df1 <- readRDS("./misc/df_unique_res.rds")
 
 # clean df so that feature names match SQL VIEWS
-df1$view <- ifelse(df1$view=='lf_roads', 'lf_roads_bf', df1$view)
-df1$view <- ifelse(df1$view=='lf_rails', 'lf_rails_bf', df1$view)
-df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
+#df1$view <- ifelse(df1$view=='lf_roads', 'lf_roads_bf', df1$view)
+#df1$view <- ifelse(df1$view=='lf_rails', 'lf_rails_bf', df1$view)
+#df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
 
 # select relevant columns
 df1 <- df1[,c(1,2,4,5, 7, 8)] 
