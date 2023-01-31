@@ -20,7 +20,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 
 COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2022-12-19]';
 
- --DROP VIEW IF EXISTS lf_roads;
+DROP VIEW IF EXISTS lf_roads;
 -- CREATE OR REPLACE VIEW lf_roads AS
 -- SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 -- feature::varchar(30), type::varchar(30), material::varchar(30), 
@@ -494,7 +494,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'IN('institutional',  'education', 'religious')
 	;
 
---DROP VIEW IF EXISTS barrier;
+DROP VIEW IF EXISTS barrier;
 /*CREATE OR REPLACE VIEW barrier AS	
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),  
 	'barrier'::varchar(30) AS feature,
@@ -539,7 +539,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	;
 
 
---DROP VIEW IF EXISTS background_layer3;
+DROP VIEW IF EXISTS background_layer3;
 /*CREATE OR REPLACE VIEW background_layer3 AS	
 SELECT (row_number() OVER ())::int AS sid, relation_id::varchar(20),  
  	'background'::varchar(30) AS feature,
