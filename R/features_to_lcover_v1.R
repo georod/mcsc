@@ -271,7 +271,7 @@ r6 <- crop(r6, r3)
 # Mask raster
 r7 <- mask(r6, r3, inverse=TRUE, maskvalue=NA)
 
-rclM <- as.matrix(cecRes[,c(3,6)])
+rclM <- as.matrix(cecRes[,c(3,7)])
 #rclM <- matrix(rclM, ncol=2, byrow=TRUE)
 r8 <- classify(r7, rclM)
 #plot(r8, type="classes")
