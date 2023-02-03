@@ -87,10 +87,10 @@ resVals <- df1
 #head(resVals)
 
 # large_mammals
-largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:5)]
+largeMam <- resVals[!is.na(resVals$res_large_mammals),c(1:4, 6)]
 
 # small_mammals
-smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:4, 6)]
+smallMam <- resVals[!is.na(resVals$res_small_mammals),c(1:3,5, 6)]
 
 names(largeMam) <- c("feature","type", "view", "resistance", "priority")
 
@@ -119,9 +119,11 @@ city <- c('Toronto')
 #city <- c('Peterborough')
 #city <- c('Peterborough', 'Brantford')
 
-featUrb <- unique(largeMam$view)
-#featUrb <- unique(smallMam$view)
-#featUrb <- featUrb[c(9:14)]
+#featUrb <- unique(largeMam$view)
+featUrb <- unique(smallMam$view)
+#featUrb <- featUrb[c(14:length(featUrb))]
+#featUrb <- featUrb[c(6:11,16,17)]
+#largeMam <- smallMam
 
 
 for (k in 1:length(city)) {

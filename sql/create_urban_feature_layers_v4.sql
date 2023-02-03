@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-01-30
+-- 2023-02-02
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -18,40 +18,8 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'building' <>'' or tags->>'building' IN ('parking','industrial', 'school', 'commercial', 'terrace', 'detached', 'semideatched_house', 'house', 'retail', 'hotel', 'apartments') or tags->> 'amenity' IN ('school', 'fast_food', 'clinic', 'theatre', 'conference_center', 'hospital', 'place_of_worship', 'police')
 	;
 
-COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2022-12-19]';
+COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-02-02]';
 
-DROP VIEW IF EXISTS lf_roads;
--- CREATE OR REPLACE VIEW lf_roads AS
--- SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
--- feature::varchar(30), type::varchar(30), material::varchar(30), 
--- CASE
--- WHEN size = '22' THEN '2'
--- WHEN size = '2;1' THEN '1'
--- WHEN size = '2; 1' THEN '1'
--- WHEN size = '2;3' THEN '2'
--- WHEN size = '10' THEN '1'
--- WHEN size = '1; 2' THEN '1'
--- WHEN size = '1;2' THEN '1'
--- WHEN size = '1,5' THEN '1.5'
--- ELSE size
--- END::numeric(3,1) AS size, (geom)::geometry(LineString, 3857) AS geom
--- FROM
--- (
--- SELECT way_id, feature, type, material,
--- 	REPLACE(size, '-', '') AS size,
---  geom
--- FROM
--- (
--- SELECT way_id,  
--- 	'linear_feature' AS feature,
--- 	tags->>'highway' AS type,
--- 	tags->>'surface' AS material,
--- 	tags ->> 'lanes' AS size,
--- 	geom AS geom
---     FROM lines WHERE tags->>'highway' <>'' or tags ->> 'highway' IN ('residential','footway', 'primary', 'motorway', 'secondary', 'tertiary', 'service')
--- 		) t1
--- 	) t2
--- 	;
 
 ---Tiziana is creating more layers for the linear features, based on traffic load and human activity. 
 
@@ -132,6 +100,7 @@ SELECT way_id,
 	) t2
 	) t3
 	; 
+
 
 DROP VIEW IF EXISTS lf_roads_low_traffic_bf;
 CREATE OR REPLACE VIEW lf_roads_low_traffic_bf AS
@@ -283,7 +252,7 @@ SELECT way_id,
 	tags->>'footway' AS material,
 	2 AS size,
 	geom AS geom
-    FROM lines WHERE tags->>'highway' <>'' or tags ->> 'highway' NOT IN (
+    FROM lines WHERE tags->>'highway' <>'' AND tags ->> 'highway' NOT IN (
         'footway','construction','escape','cycleway','steps','bridleway','construction','path','pedestrian','track','abandoned',
     'turning_loop','living_street',
     'residential', 'rest_area',
@@ -362,38 +331,6 @@ SELECT way_id,
 	;
 
 
-/*DROP VIEW IF EXISTS lf_rails_bf;
-CREATE OR REPLACE VIEW lf_rails_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6))::geometry('MultiPolygon', 3857) AS geom  
-FROM
-(
-SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
-feature::varchar(30), type::varchar(30), material::varchar(30), 
-CASE
-WHEN size is null THEN '1'
-WHEN size = '' THEN '1'
-WHEN size = '0' THEN '1'
-ELSE 1
-END::numeric(3,1) AS size, (geom)::geometry(LineString, 3857) AS geom
-FROM
-(
-SELECT way_id, feature, type, material,
-	REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size, geom
-FROM
-(
-SELECT way_id,  
-	'linear_feature_rail' AS feature,
-	tags->>'railway' AS type,
-	'' AS material,
-	'' AS size,
-	geom  AS geom
-    FROM lines WHERE tags->>'railway' NOT IN ('monorail','funicular','subway') or tags->> 'landuse' = 'railway'
-		) t1
-	) t2
-	) t3
-	; */
-	
-
 
 DROP VIEW IF EXISTS open_green;
 CREATE OR REPLACE VIEW open_green AS
@@ -405,6 +342,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse' IN ('grass', 'cemetery', 'greenfield', 'recreation_ground',  'winter_sports','brownfield', 'construction') or tags ->> 'natural' IN ('tundra') or tags->> 'golf'<>'rough' or tags->> 'highway'='construction'
 	;
+
 
 DROP VIEW IF EXISTS hetero_green;
 CREATE OR REPLACE VIEW hetero_green AS
@@ -494,17 +432,6 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse'IN('institutional',  'education', 'religious')
 	;
 
-DROP VIEW IF EXISTS barrier;
-/*CREATE OR REPLACE VIEW barrier AS	
-SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),  
-	'barrier'::varchar(30) AS feature,
-	tags->>'barrier'::varchar(30)  AS type,
-	tags->>'fence_type'::varchar(30) AS material,
-	tags->>'height'::varchar(30) AS size,
-	geom AS geom
-    FROM lines WHERE tags->>'barrier'<>''
-	;*/
-
 
 DROP VIEW IF EXISTS barrier_bf;
 CREATE OR REPLACE VIEW barrier_bf AS	
@@ -539,15 +466,5 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	;
 
 
-DROP VIEW IF EXISTS background_layer3;
-/*CREATE OR REPLACE VIEW background_layer3 AS	
-SELECT (row_number() OVER ())::int AS sid, relation_id::varchar(20),  
- 	'background'::varchar(30) AS feature,
- 	tags->>'name'::varchar(30)  AS type,
- 	tags ->> 'admin_level'::varchar(30) AS material,
- 	'' AS size,
- 	st_multi(ST_BuildArea(geom))::geometry(Multipolygon, 3857) AS geom
- 	FROM boundaries WHERE tags->> 'boundary'IN('administrative', 'political')
-	;*/
 	
 	

@@ -2,7 +2,7 @@
 # Multi-city structural Connectivity Project
 #============================================
 
-# 2023-01-23
+# 2023-02-02
 # Code Authors:
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -112,8 +112,8 @@ names(largeMam) <- c("feature","type", "view", "priority", "class")
 #===============================================
 
 #city <- c('Toronto', 'City_of_New_York', 'Chicago') #  'Fort_Collins' was done separately
-city <- c('Toronto')
-#city <- c('Chicago')
+#city <- c('Toronto')
+city <- c('Chicago')
 #city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
@@ -124,7 +124,7 @@ city <- c('Toronto')
 
 featUrb <- unique(largeMam$view) 
 #featUrb <- unique(smallMam$view)
-#featUrb <- featUrb[c(9:14)]
+#featUrb <- featUrb[c(14:length(featUrb))]
 
 
 for (k in 1:length(city)) {
