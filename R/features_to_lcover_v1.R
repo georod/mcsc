@@ -2,7 +2,7 @@
 # Multi-city structural Connectivity Project
 #============================================
 
-# 2023-02-02
+# 2023-02-03
 # Code Authors:
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -78,7 +78,9 @@ df1 <- readRDS("./misc/df_unique_res.rds")
 #df1$view <- ifelse(df1$view=='barrier', 'barrier_bf', df1$view)
 
 # select relevant columns
-df1 <- df1[,c(1,2,4,8,9)] 
+#df1 <- df1[,c(1,2,4,8,9)] 
+df1 <- df1[,c('feature', 'type', 'view', 'priority', 'class')]
+
 # remove duplicates 
 df1 <- df1[!duplicated(df1), ] 
 
@@ -112,8 +114,8 @@ names(largeMam) <- c("feature","type", "view", "priority", "class")
 #===============================================
 
 #city <- c('Toronto', 'City_of_New_York', 'Chicago') #  'Fort_Collins' was done separately
-#city <- c('Toronto')
-city <- c('Chicago')
+city <- c('Toronto')
+#city <- c('Chicago')
 #city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
@@ -241,6 +243,8 @@ r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mm
 
 cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 
+resTab <- read.csv("./misc/resistance_table.csv")
+
 # Crop North America land cover map first
 
 #ext1 <- ext(r3)
@@ -281,6 +285,22 @@ r9 <- cover(r3, r8)
 r9 <- subst(r9, 0, 100)
 #plot(r9, type="classes")
 writeRaster(r9, paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif'), overwrite=TRUE)
+
+
+
+# Create large mammal raster
+rclMlargeMam <- as.matrix(resTab[,c("class", "res_large_mammals")])
+r10 <- classify(r9, rclMlargeMam)
+writeRaster(r10, paste0(outF,"lcrasters/",city[k],"/output/",'largemam_res.tif'), overwrite=TRUE)
+
+
+# Create small mammal raster
+rclMsmallMam <- as.matrix(resTab[,c("class", "res_small_mammals")])
+r11 <- classify(r9, rclMsmallMam)
+writeRaster(r11, paste0(outF,"lcrasters/",city[k],"/output/",'smallmam_res.tif'), overwrite=TRUE)
+
+
+# Create small mammal raster
 
 }
 

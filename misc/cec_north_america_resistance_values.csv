@@ -16,5 +16,5 @@ description,rgb,value,mcsc_class,resistance_lm,resistance_sm,mcsc_value
  Cropland, RGB 230 174 102,15,resourceful_green_area,10,10,5
  Barren lands, RGB 168 171 174,16,open_green_area,15,15,6
  Urban, RGB 220 33 38,17,residential,40,30,4
- Water, RGB 76 112 163,18,water,100,100,25
- Snow and Ice, RGB 255 250 255,19,water,100,100,25
+ Water, RGB 76 112 163,18,water,100,100,24
+ Snow and Ice, RGB 255 250 255,19,water,100,100,24
