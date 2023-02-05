@@ -300,7 +300,11 @@ r11 <- classify(r9, rclMsmallMam)
 writeRaster(r11, paste0(outF,"lcrasters/",city[k],"/output/",'smallmam_res.tif'), overwrite=TRUE)
 
 
-# Create small mammal raster
+# Create source strength
+rclMsourceStr <- as.matrix(resTab[,c("class", "source_strength")])
+r12 <- classify(r9, rclMsourceStr)
+writeRaster(r12, paste0(outF,"lcrasters/",city[k],"/output/",'source_strength.tif'), overwrite=TRUE)
+
 
 }
 
