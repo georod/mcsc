@@ -44,7 +44,8 @@ SELECT way_id,
 	tags->>'footway' AS material,
 	0.5 AS size,
 	geom AS geom
-    FROM lines WHERE tags ->> 'highway' IN ('footway','construction','escape','cycleway','steps','bridleway','construction','path','pedestrian','track','abandoned')
+    FROM lines WHERE tags ->> 'highway' IN ('footway','construction','escape','cycleway','steps','bridleway','construction','path','pedestrian','track','abandoned') and
+	tags ->> 'footway' NOT IN ('sidewalk','crossing','access_aisle','link','traffic_island')
 		) t1
 	) t2
 	) t3
