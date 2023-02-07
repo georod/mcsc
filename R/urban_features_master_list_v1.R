@@ -85,19 +85,16 @@ df_unique_res <- df_unique %>%
   mutate(priority = ifelse(feature == "residential", 4, priority))%>%
   mutate(priority = ifelse(feature == "landuse_rail", 5, priority))%>%
   ##green background
-<<<<<<< HEAD
   mutate(priority = ifelse(feature == "open_green_area", 6, priority))%>%
   mutate(priority = ifelse(feature == "resourceful_green_area", 7, priority))%>%  
   mutate(priority = ifelse(feature == "hetero_green_area", 8, priority))%>%
   mutate(priority = ifelse(feature == "dense_green_area", 9, priority))%>%
-=======
   mutate(priority = ifelse(feature == "open_green_area", 5, priority))%>%
   mutate(priority = ifelse(feature == "resourceful_green_area", 6, priority))%>%  
   mutate(priority = ifelse(feature == "hetero_green_area", 7, priority))%>%
   mutate(priority = ifelse(feature == "dense_green_area", 8, priority))%>%
   ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
   mutate(priority = ifelse(feature == "water", 9, priority)) 
->>>>>>> b074416de9daaf385499853886004443a456b70a
   ##built infrastructure
   mutate(priority = ifelse(feature == "parking_surface", 10, priority))%>%
   mutate(priority = ifelse(feature == "building", 11, priority))%>%
