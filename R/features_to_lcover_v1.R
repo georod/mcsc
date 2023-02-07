@@ -114,8 +114,8 @@ names(largeMam) <- c("feature","type", "view", "priority", "class")
 #===============================================
 
 #city <- c('Toronto', 'City_of_New_York', 'Chicago') #  'Fort_Collins' was done separately
-city <- c('Toronto')
-#city <- c('Chicago')
+#city <- c('Toronto')
+city <- c('Chicago')
 #city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
