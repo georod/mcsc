@@ -1,6 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-02-06
--- This is version: create_urban_features_list_v3/v4.sql
+-- 2023-02-07
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -97,4 +96,4 @@ UNION ALL
 
 ALTER TABLE urban_features_v1 ADD CONSTRAINT urban_features_v1_pkey PRIMARY KEY (rid);
 
-COMMENT ON TABLE urban_features_v1 IS 'Master list of features defined for Ontario. This list will be used as the references for the study. [2023-02-06]';
+COMMENT ON TABLE urban_features_v1 IS 'Master list of features defined for Ontario. This list will be used as the references for the study. [2023-02-07]';

@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-02-06
+-- 2023-02-07
 -- This is version create_urban_feature_layers_v4.sql
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
@@ -19,7 +19,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'building' <>'' or tags->>'building' IN ('parking','industrial', 'school', 'commercial', 'terrace', 'detached', 'semideatched_house', 'house', 'retail', 'hotel', 'apartments') or tags->> 'amenity' IN ('school', 'fast_food', 'clinic', 'theatre', 'conference_center', 'hospital', 'place_of_worship', 'police')
 	;
 
-COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-02-06]';
+COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-02-07]';
 
 
 ---Tiziana is creating more layers for the linear features, based on traffic load and human activity. 
@@ -355,7 +355,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 DROP VIEW IF EXISTS railway_landuse;
 CREATE OR REPLACE VIEW railway_landuse AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
-	'linear_feature_rail'::varchar(30) AS feature,
+	'landuse_rail'::varchar(30) AS feature,
 	tags->>'railway'::varchar(30) AS type,
 	''::varchar(30) AS material,
 	NULL AS size,
