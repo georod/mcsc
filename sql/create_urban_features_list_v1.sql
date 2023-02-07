@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-02-03
+-- 2023-02-06
 -- This is version: create_urban_features_list_v3/v4.sql
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
@@ -8,9 +8,9 @@
 --    Run this script in the local postgres db that only has planet data for Ontario.
 
 
---DROP TABLE IF EXISTS urban_features_v1;
+DROP TABLE IF EXISTS urban_features_v1;
 
-CREATE TABLE urban_features_v2 AS
+CREATE TABLE urban_features_v1 AS
 
 SELECT DISTINCT feature, type, material, size, view, row_number() OVER (ORDER BY view, feature) AS rid
 FROM
@@ -87,16 +87,14 @@ UNION ALL
 -- commercial_industrial
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric,  'commercial_industrial' AS view FROM commercial_industrial
 )
+UNION ALL
 -- railway_landuse
-(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric,  'railway_landuse' AS view FROM commercial_industrial
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric,  'railway_landuse' AS view FROM railway_landuse
 )
---UNION ALL
---background_layer3
---(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size, 1::smallint AS priority, 'background_layer3' AS view FROM background_layer3
---)
+
 ) t1
 ;
 
-ALTER TABLE urban_features_v2 ADD CONSTRAINT urban_features_v2_pkey PRIMARY KEY (rid);
+ALTER TABLE urban_features_v1 ADD CONSTRAINT urban_features_v1_pkey PRIMARY KEY (rid);
 
-COMMENT ON TABLE urban_features_v2 IS 'Master list of features defined for Ontario. This list will be used as the references for the study. [2023-01-30]';
+COMMENT ON TABLE urban_features_v1 IS 'Master list of features defined for Ontario. This list will be used as the references for the study. [2023-02-06]';

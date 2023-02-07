@@ -9,6 +9,9 @@
 
 # Main aim: Create Urban features master list
 
+# Note: This code should be run on a local environment that has a OSM planet file loaded in PostgreSQL (not on DRAC/CC infrastructure). 
+#   Also, this code only uses features for Ontario as a template for the entire project.
+
 
 #===================
 # Libraries
@@ -41,6 +44,7 @@ con_pg <- DBI::dbConnect(
 #=================================
 # Create features list
 #=================================
+
 df <- dbGetQuery(con_pg, "SELECT distinct * FROM urban_features_v1")
 dim(df)
 

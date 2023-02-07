@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-02-03
+-- 2023-02-06
 -- This is version create_urban_feature_layers_v4.sql
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
@@ -19,7 +19,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'building' <>'' or tags->>'building' IN ('parking','industrial', 'school', 'commercial', 'terrace', 'detached', 'semideatched_house', 'house', 'retail', 'hotel', 'apartments') or tags->> 'amenity' IN ('school', 'fast_food', 'clinic', 'theatre', 'conference_center', 'hospital', 'place_of_worship', 'police')
 	;
 
-COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-02-02]';
+COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-02-06]';
 
 
 ---Tiziana is creating more layers for the linear features, based on traffic load and human activity. 
@@ -45,7 +45,7 @@ SELECT way_id,
 	0.5 AS size,
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('footway','construction','escape','cycleway','steps','bridleway','construction','path','pedestrian','track','abandoned') and 
-	tags ->> 'footway' IS NOT 'sidewalk'
+	tags ->> 'footway' <> 'sidewalk'
 		) t1
 	) t2
 	) t3
@@ -371,7 +371,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'retail'::varchar(30) AS material,
 	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE tags->>'landuse'IN('commercial',  'retail', 'industrial')
+    FROM polygons WHERE tags->>'landuse' IN ('commercial',  'retail', 'industrial')
 	;
 
 DROP VIEW IF EXISTS institutional;
