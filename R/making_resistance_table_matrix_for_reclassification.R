@@ -2,7 +2,7 @@
 ##TGC
 library(dplyr)
 
-df<-  matrix(seq(1,23,1), ncol=1, byrow=TRUE)
+df<-  matrix(seq(1,24,1), ncol=1, byrow=TRUE)
 df<-data.frame(df)
 colnames(df) <- c("class")
 
@@ -13,34 +13,36 @@ df <- df %>%
   mutate(description = ifelse(class == 2, "commercial", description)) %>%
   mutate(description = ifelse(class == 3, "institutional", description))%>%
   mutate(description = ifelse(class == 4, "residential", description))%>%
+  mutate(description = ifelse(class == 5, "landuse_railways", description))%>%
   ##green background
-  mutate(description = ifelse(class == 5, "open_green_area", description))%>%
-  mutate(description = ifelse(class == 6, "resourceful_green_area", description))%>%  
-  mutate(description = ifelse(class == 7, "hetero_green_area", description))%>%
-  mutate(description = ifelse(class == 8, "dense_green_area", description))%>%
+  mutate(description = ifelse(class == 6, "open_green_area", description))%>%
+  mutate(description = ifelse(class == 7, "resourceful_green_area", description))%>%  
+  mutate(description = ifelse(class == 8, "hetero_green_area", description))%>%
+  mutate(description = ifelse(class == 9, "dense_green_area", description))%>%
+  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
+  mutate(description = ifelse(class == 10, "water", description))
   ##built infrastructure
-  mutate(description = ifelse(class == 9, "parking_surface", description))%>%
-  mutate(description = ifelse(class == 10, "building", description))%>%
+  mutate(description = ifelse(class == 11, "parking_surface", description))%>%
+  mutate(description = ifelse(class == 12, "building", description))%>%
   ##roads - highways go below other linear descriptions to allow for over and underpasses
-  mutate(description = ifelse(class == 11,"roads_vh_traffic", description))%>%
-  mutate(description = ifelse(class == 12, "roads_na_traffic", description))%>%
-  mutate(description = ifelse(class == 13, "roads_vl_traffic", description))%>%
-  mutate(description = ifelse(class == 14, "roads_l_traffic", description))%>%  
-  mutate(description = ifelse(class == 15, "roads_m_traffic", description))%>%
-  mutate(description = ifelse(class == 16, "roads_h_traffic_ls", description))%>%
-  mutate(description = ifelse(class == 17, "roads_h_traffic_hs", description))%>%
+  mutate(description = ifelse(class == 13,"roads_vh_traffic", description))%>%
+  mutate(description = ifelse(class == 14, "roads_na_traffic", description))%>%
+  mutate(description = ifelse(class == 15, "roads_vl_traffic", description))%>%
+  mutate(description = ifelse(class == 16, "roads_l_traffic", description))%>%  
+  mutate(description = ifelse(class == 17, "roads_m_traffic", description))%>%
+  mutate(description = ifelse(class == 18, "roads_h_traffic_ls", description))%>%
+  mutate(description = ifelse(class == 19, "roads_h_traffic_hs", description))%>%
   #trams included here
-  mutate(description = ifelse(class == 18, "tram", description))%>%
+  mutate(description = ifelse(class == 20, "tram", description))%>%
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher description as roads
-  mutate(description = ifelse(class == 19, "trails", description))%>%
+  mutate(description = ifelse(class == 21, "trails", description))%>%
   #mutate(description = ifelse(class == 20, "sidewalks", description))%>%
   ##railways
-  mutate(description = ifelse(class == 20, "rails", description))%>%
-  mutate(description = ifelse(class == 21, "unused_rails", description))%>%
+  mutate(description = ifelse(class == 22, "rails", description))%>%
+  mutate(description = ifelse(class == 23, "unused_rails", description))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(description = ifelse(class == 22, "barrier", description))%>%
-  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(description = ifelse(class == 23, "water", description))
+  mutate(description = ifelse(class == 24, "barrier", description))%>%
+
 
 #write.csv(df_unique_res, 'df_unique_res_2.csv') 
 ##set resistance values across layers -- this step could be bypassed by creating only the landcover layer and reclassifying the classes into the resistance values, I am creating R script for that
@@ -51,34 +53,36 @@ df<- df %>%
   mutate(res_large_mammals = ifelse(class == 2, 50, res_large_mammals)) %>%
   mutate(res_large_mammals = ifelse(class == 3, 35, res_large_mammals))%>%
   mutate(res_large_mammals = ifelse(class == 4, 40, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 5, 30, res_large_mammals))%>%
   ##green background
-  mutate(res_large_mammals = ifelse(class == 5, 15, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 6, 10, res_large_mammals))%>%  
-  mutate(res_large_mammals = ifelse(class == 7, 10, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 8, 5, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 6, 15, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 7, 10, res_large_mammals))%>%  
+  mutate(res_large_mammals = ifelse(class == 8, 10, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 9, 5, res_large_mammals))%>%
+  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
+  mutate(res_large_mammals = ifelse(class == 10, 100, res_large_mammals)) 
   ##built infrastructure
-  mutate(res_large_mammals = ifelse(class == 9, 20, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 10, 100, res_large_mammals))%>%
-  ##roads - highways go below other linear classs to allow for over and underpasses
-  mutate(res_large_mammals = ifelse(class == 11, 80, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 12, 40, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 13, 25, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 14, 35, res_large_mammals))%>%  
-  mutate(res_large_mammals = ifelse(class == 15, 40, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 16, 45, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 17, 50, res_large_mammals))%>%
-  #trams included here
+  mutate(res_large_mammals = ifelse(class == 11, 20, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 12, 100, res_large_mammals))%>%
+  ##roads - highways go below other linear class to allow for over and underpasses
+  mutate(res_large_mammals = ifelse(class == 13, 80, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 14, 40, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 15, 25, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 16, 35, res_large_mammals))%>%  
+  mutate(res_large_mammals = ifelse(class == 17, 40, res_large_mammals))%>%
   mutate(res_large_mammals = ifelse(class == 18, 45, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 19, 50, res_large_mammals))%>%
+  #trams included here
+  mutate(res_large_mammals = ifelse(class == 20, 45, res_large_mammals))%>%
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher res_large_mammals as roads
-  mutate(res_large_mammals = ifelse(class == 19, 15, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 21, 15, res_large_mammals))%>%
   #mutate(res_large_mammals = ifelse(class == 20, 20, res_large_mammals))%>%
   ##railways
-  mutate(res_large_mammals = ifelse(class == 20, 15, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 21, 10, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 22, 15, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 23, 10, res_large_mammals))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(res_large_mammals = ifelse(class == 22, 70, res_large_mammals))%>%
-  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(res_large_mammals = ifelse(class == 23, 100, res_large_mammals)) 
+  mutate(res_large_mammals = ifelse(class == 24, 70, res_large_mammals))%>%
+
 
 
 
@@ -94,10 +98,10 @@ df  <- df %>%
   mutate(res_small_mammals = ifelse(class == 11, 95, res_small_mammals))
 
 df  <- df %>% 
-  mutate(source_strength = ifelse(class == 5, 5, NA))%>%
-  mutate(source_strength = ifelse(class == 6, 15, source_strength))%>%
+  mutate(source_strength = ifelse(class == 6, 5, NA))%>%
   mutate(source_strength = ifelse(class == 7, 15, source_strength))%>%
-  mutate(source_strength = ifelse(class == 8,20, source_strength))
+  mutate(source_strength = ifelse(class == 8, 15, source_strength))%>%
+  mutate(source_strength = ifelse(class == 9,20, source_strength))
 
 write.csv(df, "resistance_table.csv", row.names=FALSE)
 
