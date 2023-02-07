@@ -9,6 +9,9 @@
 
 # Main aim: Create Urban features master list
 
+# Note: This code should be run on a local environment that has a OSM planet file loaded in PostgreSQL (not on DRAC/CC infrastructure). 
+#   Also, this code only uses features for Ontario as a template for the entire project.
+
 
 #===================
 # Libraries
@@ -41,6 +44,7 @@ con_pg <- DBI::dbConnect(
 #=================================
 # Create features list
 #=================================
+
 df <- dbGetQuery(con_pg, "SELECT distinct * FROM urban_features_v1")
 dim(df)
 
@@ -99,14 +103,14 @@ df_unique_res <- df_unique %>%
   mutate(priority = ifelse(feature == "linear_feature_rail" & type %in% c('tram'), 18, priority))%>%
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher priority as roads
   mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material != 'sidewalk', 19, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material == 'sidewalk', 20, priority))%>%
+  #mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material == 'sidewalk', 20, priority))%>%
   ##railways
-  mutate(priority = ifelse(feature == "linear_feature_rail", 21, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_rail"& type %in% c('abandoned','disused','construction'), 22, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_rail", 20, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_rail"& type %in% c('abandoned','disused','construction'), 21, priority))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(priority = ifelse(feature == "barrier", 23, priority))%>%
+  mutate(priority = ifelse(feature == "barrier", 22, priority))%>%
   ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(priority = ifelse(feature == "water", 24, priority)) 
+  mutate(priority = ifelse(feature == "water", 23, priority)) 
 
 
 
@@ -144,7 +148,7 @@ df_unique_res <- df_unique_res %>%
   mutate(resistance = ifelse(feature == "linear_feature_rail"& type %in% c('tram'), 45, resistance))%>%
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher resistance as roads
   mutate(resistance = ifelse(feature == "linear_feature_no_traffic"& material != 'sidewalk', 15, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_no_traffic"& material == 'sidewalk', 20, resistance))%>%
+  #mutate(resistance = ifelse(feature == "linear_feature_no_traffic"& material == 'sidewalk', 20, resistance))%>%
   ##railways
   mutate(resistance = ifelse(feature == "linear_feature_rail", 15, resistance))%>%
   mutate(resistance = ifelse(feature == "linear_feature_rail"& type %in% c('abandoned','disused','construction'), 10, resistance))%>%
