@@ -85,10 +85,19 @@ df_unique_res <- df_unique %>%
   mutate(priority = ifelse(feature == "residential", 4, priority))%>%
   mutate(priority = ifelse(feature == "landuse_rail", 5, priority))%>%
   ##green background
+<<<<<<< HEAD
   mutate(priority = ifelse(feature == "open_green_area", 6, priority))%>%
   mutate(priority = ifelse(feature == "resourceful_green_area", 7, priority))%>%  
   mutate(priority = ifelse(feature == "hetero_green_area", 8, priority))%>%
   mutate(priority = ifelse(feature == "dense_green_area", 9, priority))%>%
+=======
+  mutate(priority = ifelse(feature == "open_green_area", 5, priority))%>%
+  mutate(priority = ifelse(feature == "resourceful_green_area", 6, priority))%>%  
+  mutate(priority = ifelse(feature == "hetero_green_area", 7, priority))%>%
+  mutate(priority = ifelse(feature == "dense_green_area", 8, priority))%>%
+  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
+  mutate(priority = ifelse(feature == "water", 9, priority)) 
+>>>>>>> b074416de9daaf385499853886004443a456b70a
   ##built infrastructure
   mutate(priority = ifelse(feature == "parking_surface", 10, priority))%>%
   mutate(priority = ifelse(feature == "building", 11, priority))%>%
@@ -115,7 +124,6 @@ df_unique_res <- df_unique %>%
 
 
 
-
 # If correct, there should not be resistance values equal to NA. It works.
 #unique(df_unique_res[(df_unique_res$res_large_mammals=='NULL'), 2])
 #unique(df_unique_res[(df_unique_res$res_small_mammals=='NULL'), 2])
@@ -135,6 +143,8 @@ df_unique_res <- df_unique_res %>%
   mutate(resistance = ifelse(feature == "resourceful_green_area", 10, resistance))%>%  
   mutate(resistance = ifelse(feature == "hetero_green_area", 10, resistance))%>%
   mutate(resistance = ifelse(feature == "dense_green_area", 5, resistance))%>%
+  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
+  mutate(resistance = ifelse(feature == "water", 100, resistance)) 
   ##built infrastructure
   mutate(resistance = ifelse(feature == "parking_surface", 20, resistance))%>%
   mutate(resistance = ifelse(feature == "building", 100, resistance))%>%
@@ -156,8 +166,7 @@ df_unique_res <- df_unique_res %>%
   mutate(resistance = ifelse(feature == "linear_feature_rail"& type %in% c('abandoned','disused','construction'), 10, resistance))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
   mutate(resistance = ifelse(feature == "barrier", 70, resistance))%>%
-  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(resistance = ifelse(feature == "water", 100, resistance)) 
+
 
 
 ##update resistance values for small_mammals and add them in a new column
