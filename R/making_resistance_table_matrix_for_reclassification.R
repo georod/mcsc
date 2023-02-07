@@ -2,7 +2,7 @@
 ##TGC
 library(dplyr)
 
-df<-  matrix(seq(1,24,1), ncol=1, byrow=TRUE)
+df<-  matrix(seq(1,23,1), ncol=1, byrow=TRUE)
 df<-data.frame(df)
 colnames(df) <- c("class")
 
@@ -33,14 +33,14 @@ df <- df %>%
   mutate(description = ifelse(class == 18, "tram", description))%>%
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher description as roads
   mutate(description = ifelse(class == 19, "trails", description))%>%
-  mutate(description = ifelse(class == 20, "sidewalks", description))%>%
+  #mutate(description = ifelse(class == 20, "sidewalks", description))%>%
   ##railways
-  mutate(description = ifelse(class == 21, "rails", description))%>%
-  mutate(description = ifelse(class == 22, "unused_rails", description))%>%
+  mutate(description = ifelse(class == 20, "rails", description))%>%
+  mutate(description = ifelse(class == 21, "unused_rails", description))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(description = ifelse(class == 23, "barrier", description))%>%
+  mutate(description = ifelse(class == 22, "barrier", description))%>%
   ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(description = ifelse(class == 24, "water", description))
+  mutate(description = ifelse(class == 23, "water", description))
 
 #write.csv(df_unique_res, 'df_unique_res_2.csv') 
 ##set resistance values across layers -- this step could be bypassed by creating only the landcover layer and reclassifying the classes into the resistance values, I am creating R script for that
@@ -71,14 +71,14 @@ df<- df %>%
   mutate(res_large_mammals = ifelse(class == 18, 45, res_large_mammals))%>%
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher res_large_mammals as roads
   mutate(res_large_mammals = ifelse(class == 19, 15, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 20, 20, res_large_mammals))%>%
+  #mutate(res_large_mammals = ifelse(class == 20, 20, res_large_mammals))%>%
   ##railways
-  mutate(res_large_mammals = ifelse(class == 21, 15, res_large_mammals))%>%
-  mutate(res_large_mammals = ifelse(class == 22, 10, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 20, 15, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 21, 10, res_large_mammals))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(res_large_mammals = ifelse(class == 23, 70, res_large_mammals))%>%
+  mutate(res_large_mammals = ifelse(class == 22, 70, res_large_mammals))%>%
   ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(res_large_mammals = ifelse(class == 24, 100, res_large_mammals)) 
+  mutate(res_large_mammals = ifelse(class == 23, 100, res_large_mammals)) 
 
 
 
