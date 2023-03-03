@@ -113,9 +113,13 @@ names(largeMam) <- c("feature","type", "view", "priority", "class")
 # Create rasters for each feature
 #===============================================
 
-#city <- c('Toronto', 'City_of_New_York', 'Chicago') #  'Fort_Collins' was done separately
+city <- c('Toronto', 'City_of_New_York', 'Atlanta', 'Berkeley', 'Boston', 'Fort_Worth', 'Edmonton', 'Fort_Collins', 'Houston','Little_Rock', 'Manchester', 'Maryland', 'Pasadena', 'Phoenix', 'Pomona', 'Salt_Lake_City', 'Saskatoon', 'St_Louis', 'Syracuse', 'Vancouver', 'Wilmington', 'Urbana')
+#city <- c('Vancouver', 'Wilmington', 'Urbana')
+#city <- c('Little_Rock', 'Manchester', 'Maryland', 'Pasadena', 'Phoenix', 'Pomona', 'Salt_Lake_City', 'Saskatoon', 'St_Louis', 'Syracuse', 'Vancouver', 'Wilmington', 'Urbana')
+#city <- c('Toronto', 'City_of_New_York', 'Atlanta', 'Berkeley', 'Boston', 'Fort_Worth', 'Edmonton', 'Fort_Collins', 'Houston')
+#city <- c('Toronto', 'City_of_New_York', 'Fort_Collins') 
 #city <- c('Toronto')
-city <- c('Chicago')
+#city <- c('Chicago')
 #city <- c('City_of_New_York')
 #city <- c('City_of_New_York', 'Chicago')
 #city <- c('Fort_Collins')
@@ -129,65 +133,65 @@ featUrb <- unique(largeMam$view)
 #featUrb <- featUrb[c(14:length(featUrb))]
 
 
-for (k in 1:length(city)) {
+#for (k in 1:length(city)) {
 
-  for (i in 1:length(featUrb)) {
+#  for (i in 1:length(featUrb)) {
 
-    vals <- sqldf(paste0("SELECT distinct priority, class FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, class;"))
+#    vals <- sqldf(paste0("SELECT distinct priority, class FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority, class;"))
 
-    for (j in 1:nrow(vals)) {
+#    for (j in 1:nrow(vals)) {
 
-      sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, class, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND class=", vals$class[j], " ORDER BY class;"))
+#      sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, class, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=",vals$priority[j], " AND class=", vals$class[j], " ORDER BY class;"))
 
 
-      queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
+#      queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
 
       # the [1] could be removed if there are no dups
-      queryUrFts <-paste0("SELECT ", sqlPrimer$class[1]," as class, geom
-FROM
-(
-  SELECT (ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('Polygon', 3857) AS geom
-    FROM (",
+#      queryUrFts <-paste0("SELECT ", sqlPrimer$class[1]," as class, geom
+# FROM
+# (
+#  SELECT (ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('Polygon', 3857) AS geom
+#    FROM (",
 
-  #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-  paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
-
-
-  ") t1
-  JOIN
-   ", city[k],"_env", " t2
-  ON st_intersects(t1.geom,t2.geom)) t3;")
-
-  vectorEnv <- vect(st_read(con_pg, query=queryEnv))
-
-  raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
-
-  #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
-
-  vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
-
-  if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
-
-  if( length(vectorUrFts)==0)
-  { print("empty vector")} else
-
-  {
-    rasterRes1 <- rasterize(vectorUrFts, raster1, field="class", background=NA, touches=FALSE,
-                            update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
-
-    dir.create(paste0(outF,"lcrasters"))
-    dir.create(paste0(outF,"lcrasters/",city[k]))
-
-    writeRaster(rasterRes1, paste0(outF,"lcrasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$class[1],".tif"), overwrite=TRUE)
-
-  }
-
-    }
-
-  }
+#  #paste0("SELECT * FROM ", sqlPrimer$view[1], " WHERE type ", ifelse(paste0(paste(sqlPrimer$type, collapse = "', '"))=='none', 'IS NULL', paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
+#  paste0("SELECT * FROM ", sqlPrimer$view[1], " ",ifelse(grepl('NULL', paste(sqlPrimer$type, collapse = "', '")), paste0(" WHERE type IS NULL OR type ", paste0("IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" )), paste0("WHERE TYPE IN (","'",paste(sqlPrimer$type, collapse = "', '"), "'", ")" ) )) ,
 
 
-}
+#  ") t1
+#  JOIN
+#   ", city[k],"_env", " t2
+#  ON st_intersects(t1.geom,t2.geom)) t3;")
+
+#  vectorEnv <- vect(st_read(con_pg, query=queryEnv))
+
+#  raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
+
+#  #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
+
+#  vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
+
+#  if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
+
+#  if( length(vectorUrFts)==0)
+#  { print("empty vector")} else
+
+#  {
+#    rasterRes1 <- rasterize(vectorUrFts, raster1, field="class", background=NA, touches=FALSE,
+#                            update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
+
+#    dir.create(paste0(outF,"lcrasters"))
+#    dir.create(paste0(outF,"lcrasters/",city[k]))
+
+#    writeRaster(rasterRes1, paste0(outF,"lcrasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$class[1],".tif"), overwrite=TRUE)
+
+#  }
+
+#    }
+
+#  }
+
+
+# }
 
 
 # disconnect from db
