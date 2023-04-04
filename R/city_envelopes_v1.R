@@ -72,7 +72,9 @@ con_pg <- DBI::dbConnect(
 #city <- c('Peterborough', 'Brantford') # 'Brantford'
 city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
-city <- city[!(city$pg_city %in% c('Toronto', 'Chicago', 'City_of_New_York', 'Fort_Collins')),]
+#city <- city[!(city$pg_city %in% c('Toronto', 'Chicago', 'City_of_New_York', 'Fort_Collins')),]
+city <- city[(city$pg_city %in% c('Mexico')),]
+print(city)
 
 # Loop for creating city spatial envelopes
 
