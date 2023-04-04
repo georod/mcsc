@@ -50,7 +50,7 @@ dim(df)
 
 
 ##create able with unique values
-df_unique <- df %>% dplyr::count(feature, type, material, view, .drop=FALSE)
+df_unique <- df %>% dplyr::count(feature, type, material, size, view, .drop=FALSE)
 #check 
 #df_unique %>% filter(feature =="commercial_industrial")
 
@@ -79,108 +79,51 @@ head(df_unique)
 df_unique_res <- df_unique %>% 
   #priority values define how features are overlaid in the final map, with higher values being on top
   ##landuse background
-  mutate(priority = ifelse(feature == "commercial_industrial" & type =="industrial", 1, 'NULL')) %>% #Why NULL and not NA?
+  mutate(priority = ifelse(feature == "commercial_industrial" & (type %in% c("industrial", "fairground") | size == "factory"), 1, 'NULL')) %>% #Why NULL and not NA?
   mutate(priority = ifelse(feature == "commercial_industrial" & type %in% c("commercial", "retail"), 2, priority)) %>%
   mutate(priority = ifelse(feature == "institutional", 3, priority))%>%
   mutate(priority = ifelse(feature == "residential", 4, priority))%>%
   mutate(priority = ifelse(feature == "landuse_rail", 5, priority))%>%
-  ##green background
+  ##green background, now includes protected areas as a layer to account those protected areas where vegetation is not described (this could be superceded by the CEC landcover
   mutate(priority = ifelse(feature == "open_green_area", 6, priority))%>%
-  mutate(priority = ifelse(feature == "resourceful_green_area", 7, priority))%>%  
-  mutate(priority = ifelse(feature == "hetero_green_area", 8, priority))%>%
-  mutate(priority = ifelse(feature == "dense_green_area", 9, priority))%>%
-  #mutate(priority = ifelse(feature == "open_green_area", 6, priority))%>%
-  #mutate(priority = ifelse(feature == "resourceful_green_area", 7, priority))%>%  
-  #mutate(priority = ifelse(feature == "hetero_green_area", 8, priority))%>%
-  #mutate(priority = ifelse(feature == "dense_green_area", 9, priority))%>%
-  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(priority = ifelse(feature == "water", 10, priority))%>% 
+  mutate(priority = ifelse(feature == "protected_area", 7, priority))%>%  
+  mutate(priority = ifelse(feature == "resourceful_green_area", 8, priority))%>%  
+  mutate(priority = ifelse(feature == "hetero_green_area" & !(material %in% c('sand','scree','sinkhole', 'beach') | 
+                                                             type %in% c('brownfield', 'construction') | 
+                                                             size %in% c('bunker')), 9, priority)) %>%
+  ##bare non-vegetated-non-concrete layer
+  mutate(priority = ifelse(feature == "hetero_green_area" & (material %in% c('sand','scree','sinkhole', 'beach') | 
+                                                             type %in% c('brownfield', 'construction') | 
+                                                             size %in% c('bunker')), 10 , priority))%>%
+
+  mutate(priority = ifelse(feature == "dense_green_area", 11, priority))%>%
+  ##water, does not include temporary retention basins
+  mutate(priority = ifelse(feature == "water", 12, priority))%>% 
   ##built infrastructure
-  mutate(priority = ifelse(feature == "parking_surface", 11, priority))%>%
-  mutate(priority = ifelse(feature == "building", 12, priority))%>%
+  mutate(priority = ifelse(feature == "parking_surface", 13, priority))%>%
+  mutate(priority = ifelse(feature == "building", 14, priority))%>%
   ##roads - highways go below other linear features to allow for over and underpasses
-  mutate(priority = ifelse(feature == "linear_feature_vh_traffic",13, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_na_traffic", 14, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_vl_traffic",15, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_l_traffic", 16, priority))%>%  
-  mutate(priority = ifelse(feature == "linear_feature_m_traffic", 17, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_h_traffic_ls", 18, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_h_traffic_hs", 19, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_vh_traffic",15, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material == 'sidewalk', 16, priority))%>% ### sidewalks.
+  mutate(priority = ifelse(feature == "linear_feature_na_traffic", 17, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_vl_traffic",18, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_l_traffic", 19, priority))%>%  
+  mutate(priority = ifelse(feature == "linear_feature_m_traffic", 20, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_h_traffic_ls", 21, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_h_traffic_hs", 22, priority))%>%
   #trams included here
-  mutate(priority = ifelse(feature == "linear_feature_rail" & type %in% c('tram'), 20, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_rail" & type == 'tram', 23, priority))%>% ## this layer did not appear, should debug code
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher priority as roads
-  mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material != 'sidewalk', 21, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material != 'sidewalk', 24, priority))%>% ### sidewalks.
+
   #mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material == 'sidewalk', 20, priority))%>%
   ##railways
-  mutate(priority = ifelse(feature == "linear_feature_rail", 22, priority))%>%
-  mutate(priority = ifelse(feature == "linear_feature_rail" & type %in% c('abandoned','disused','construction'), 23, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_rail", 25, priority))%>%
+  mutate(priority = ifelse(feature == "linear_feature_rail" & (type %in% c('abandoned','disused','construction') | material == 'construction'), 26, priority))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(priority = ifelse(feature == "barrier", 24, priority))
-  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  #mutate(priority = ifelse(feature == "water", 24, priority)) 
+  mutate(priority = ifelse(feature == "barrier", 27, priority)) ## the
 
 
-
-# If correct, there should not be resistance values equal to NA. It works.
-#unique(df_unique_res[(df_unique_res$res_large_mammals=='NULL'), 2])
-#unique(df_unique_res[(df_unique_res$res_small_mammals=='NULL'), 2])
-
-#write.csv(df_unique_res, 'df_unique_res_2.csv') 
-##set resistance values across layers -- this step could be bypassed by creating only the landcover layer and reclassifying the classes into the resistance values, I am creating R script for that
-df_unique_res <- df_unique_res %>% 
-  #resistance values define the resistance to movement of each feature
-  ##landuse background
-  mutate(resistance = ifelse(feature == "commercial_industrial" & type =="industrial", 70, 'NULL')) %>%
-  mutate(resistance = ifelse(feature == "commercial_industrial" & type %in% c("commercial", "retail"), 50, resistance)) %>%
-  mutate(resistance = ifelse(feature == "institutional", 35, resistance))%>%
-  mutate(resistance = ifelse(feature == "residential", 40, resistance))%>%
-  mutate(resistance = ifelse(feature == "landuse_rail", 30, resistance))%>%
-  ##green background
-  mutate(resistance = ifelse(feature == "open_green_area", 15, resistance))%>%
-  mutate(resistance = ifelse(feature == "resourceful_green_area", 10, resistance))%>%  
-  mutate(resistance = ifelse(feature == "hetero_green_area", 10, resistance))%>%
-  mutate(resistance = ifelse(feature == "dense_green_area", 5, resistance))%>%
-  ##flooded surface (note includes wetlands, if wetlands want to be separated sql code should be changed)
-  mutate(resistance = ifelse(feature == "water", 100, resistance)) %>%
-  ##built infrastructure
-  mutate(resistance = ifelse(feature == "parking_surface", 20, resistance))%>%
-  mutate(resistance = ifelse(feature == "building", 100, resistance))%>%
-  ##roads - highways go below other linear features to allow for over and underpasses
-  mutate(resistance = ifelse(feature == "linear_feature_vh_traffic", 80, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_na_traffic", 40, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_vl_traffic", 25, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_l_traffic", 35, resistance))%>%  
-  mutate(resistance = ifelse(feature == "linear_feature_m_traffic", 40, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_h_traffic_ls", 45, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_h_traffic_hs", 50, resistance))%>%
-  #trams included here
-  mutate(resistance = ifelse(feature == "linear_feature_rail"& type %in% c('tram'), 45, resistance))%>%
-  ##pedestrian roads #allows for overpasses and underpasses by being set with higher resistance as roads
-  mutate(resistance = ifelse(feature == "linear_feature_no_traffic"& material != 'sidewalk', 15, resistance))%>%
-  #mutate(resistance = ifelse(feature == "linear_feature_no_traffic"& material == 'sidewalk', 20, resistance))%>%
-  ##railways
-  mutate(resistance = ifelse(feature == "linear_feature_rail", 15, resistance))%>%
-  mutate(resistance = ifelse(feature == "linear_feature_rail"& type %in% c('abandoned','disused','construction'), 10, resistance))%>%
-  ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
-  mutate(resistance = ifelse(feature == "barrier", 70, resistance))
-
-
-
-##update resistance values for small_mammals and add them in a new column
-df_unique_res  <- df_unique_res %>% 
-  mutate(resistance_sm = ifelse(feature == "parking_surface", 30, resistance))%>%
-  mutate(resistance_sm = ifelse(feature == "residential", 30, resistance_sm))%>%
-  mutate(resistance_sm = ifelse(feature == "institutional", 30, resistance_sm))%>%
-  mutate(resistance_sm = ifelse(feature == "linear_feature_vl_traffic",40, resistance_sm))%>% 
-  mutate(resistance_sm = ifelse(feature == "linear_feature_l_traffic", 50, resistance_sm))%>%
-  mutate(resistance_sm = ifelse(feature == "linear_feature_m_traffic", 65, resistance_sm))%>%
-  mutate(resistance_sm = ifelse(feature == "linear_feature_h_traffic_ls", 70, resistance_sm))%>%
-  mutate(resistance_sm = ifelse(feature == "linear_feature_h_traffic_hs", 80, resistance_sm))%>%
-  mutate(resistance_sm = ifelse(feature == "linear_feature_vh_traffic", 95, resistance_sm))
-
-
-#rename columns
-df_unique_res  <- df_unique_res %>% rename(res_large_mammals = resistance, res_small_mammals = resistance_sm)
 
 # Add new column "class" 
 df_unique_res$class <- df_unique_res$priority
