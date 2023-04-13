@@ -90,7 +90,7 @@ for (j in 1:nrow(city)) {
   
   dbSendQuery(con_pg, paste0("CREATE INDEX ", city$pg_city[j],"_env", "_geom_idx ON ", city$pg_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
 
-  
+  print(city$pg_city[j])
 }
   
 

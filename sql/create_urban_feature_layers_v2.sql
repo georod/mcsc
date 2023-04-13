@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-02-07
+-- 2023-04-04
 -- This is version create_urban_feature_layers_v4.sql
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
@@ -22,7 +22,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->> 'aeroway' IN ('terminal') -- airports terminals were recognized as buildings
 	;
 	
-COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-02-07]';
+COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-04-04]';
 
 
 ---Tiziana is creating more layers for the linear features, based on traffic load and human activity. 
