@@ -235,7 +235,7 @@ SELECT way_id,
 	geom AS geom
     FROM lines WHERE tags->>'highway' <>'' AND tags ->> 'highway' NOT IN (
         'footway','construction','escape','cycleway','steps','bridleway','construction','path','pedestrian','track','abandoned',
-    'turning_loop','living_street', ,'bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 'bus and cyclists',
+    'turning_loop','living_street', 'bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 'bus and cyclists',
 	'service','services',  'busway', 'sidewalk',
     'residential', 'rest_area',
     'primary', 'motorway_junction',
