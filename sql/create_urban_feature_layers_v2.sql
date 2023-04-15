@@ -320,7 +320,8 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	'hetero_green_area'::varchar(30) AS feature,
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'natural'::varchar(30) AS material,
-	tags->>'golf'::varchar(30) AS size,
+	--tags->>'golf'::varchar(30) AS size,
+	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'natural'IN('garden',
 	 'scrub', 'shrubbery', 'tundra', 'mud', 'dune','cliff',
@@ -423,7 +424,8 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	'commercial_industrial'::varchar(30) AS feature,
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'retail'::varchar(30) AS material,
-	tags->>'industrial'::varchar(30) AS size,
+	--tags->>'industrial'::varchar(30) AS size,
+	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse' IN ('commercial',  'retail', 'industrial', 'fairground') or
 	tags->> 'industrial' IN ('factory') -- extract from size = factory as industrial 
@@ -437,7 +439,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	''::varchar(30) AS material,
 	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE tags->>'landuse'IN('institutional',  'education', 'religious', 'military') or
+    FROM polygons WHERE tags->>'landuse' IN ('institutional',  'education', 'religious', 'military') or
 	tags->> 'amenity' IN ('school', 'hospital', 'university','fast_food', 'clinic', 'theatre', 'conference_center', 
 	'place_of_worship', 'police') or
 	tags->> 'leisure' IN ('golf_course') or
@@ -458,14 +460,12 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 	'barrier'::varchar(30) AS feature,
 	tags->>'barrier'::varchar(30)  AS type,
 	tags->>'fence_type'::varchar(30) AS material,
-	tags->>'height'::varchar(30) AS size,
+	--tags->>'height'::varchar(30) AS size,
+	NULL AS size,
 	geom AS geom
-    FROM lines WHERE tags->>'barrier'<>''
+    FROM lines WHERE tags->>'barrier' <>''
 	) t1
 	) t2
 	;
 
 
-
-	
-	

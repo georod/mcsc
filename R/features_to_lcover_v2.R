@@ -106,6 +106,8 @@ sqlList1[i] <- paste0("SELECT feature, CASE WHEN type is null then 'NULL' else t
    city[k],"_env", " t2 ON st_intersects(t1.geom,t2.geom)")
    }
 
+   
+
 #length(sqlList1)   
 #sqlUni <- paste0(sqlList1[[1]], " UNION ALL ", sqlList1[[2]],
  
