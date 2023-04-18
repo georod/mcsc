@@ -28,7 +28,8 @@ COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-04-04]';
 ---Tiziana is creating more layers for the linear features, based on traffic load and human activity. 
 --no traffic roads does not contian sidewalks
 DROP VIEW IF EXISTS lf_roads_notraffic_bf;
-CREATE OR REPLACE VIEW lf_roads_notraffic_bf AS
+DROP VIEW IF EXISTS lf_roads_no_traffic_bf;
+CREATE OR REPLACE VIEW lf_roads_no_traffic_bf AS
 SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
@@ -48,7 +49,7 @@ SELECT way_id,
 	0.5 AS size,
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('footway','construction','escape',
-	'cycleway','steps','bridleway','construction','path','pedestrian','track',
+	'cycleway','steps','bridleway','path','pedestrian','track',
 	'abandoned','bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 
 	'bus and cyclists') or  --it was and tags ->> 'footway' <> 'sidewalk' for excluding sidewalks
 	tags ->> 'footway' IN ('sidewalk') -- bostons finds a problem with these, let's try reintegrating them but a different overlay order so buildings and other roads appear over them.
