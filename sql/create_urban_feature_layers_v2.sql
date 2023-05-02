@@ -373,16 +373,16 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'water'::varchar(30) AS material,
 	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE (tags->>'landuse'='basin' or 
+    FROM polygons WHERE tags->>'landuse'='basin' or 
 	tags->> 'natural' IN ('water', 'spring', 'waterway') or 
 	tags->> 'waterway' IN ('river', 'stream', 'tidal_channel', 'canal', 'drain', 'ditch', 'yes') or
 	tags->> 'water' <>'' or
 	tags->> 'water' <> 'intermittent' or
 	tags->> 'landuse' = 'basin' or
-	tags->> 'basin' = 'detention') and
-	(tags->> 'intermittent' <> 'yes' or --do not include anything that is seasonal/temporal
-	tags->> 'seasonal' <> 'yes' or
-	tags->> 'tidal' <> 'yes')
+	tags->> 'basin' = 'detention' and
+	(tags->> 'intermittent' <> 'yes' and --do not include anything that is seasonal/temporal
+	tags->> 'seasonal' <> 'yes' and
+	tags->> 'tidal' <> 'yes'
 	;
  
 DROP VIEW IF EXISTS parking_surface;
