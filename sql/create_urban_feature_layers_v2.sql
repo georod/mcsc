@@ -298,7 +298,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	'sports_centre', 'stadium', 'pitch', 'picnic_table', 'pitch', 'dog_park', 'playground') or 
 	tags ->> 'sport' = 'soccer' or 
 	tags ->> 'power' = 'substation' or
-	tags ->> 'surface' = 'grass'
+	tags ->> 'surface' = 'grass' 
 	;
 
 DROP VIEW IF EXISTS protected_area;
@@ -334,7 +334,8 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	'brownfield', 'construction') or -- these are bare non-concrete that can be called later from the feature column
 	tags->> 'meadow'<>'' or 
 	tags->> 'golf' IN ('rough','bunker') or -- bunker is bare non-concrete that can be called later from the size column
-	tags->> 'grassland' = 'prairie'
+	tags->> 'grassland' = 'prairie' or
+	tags->> 'waterway' = 'boatyard' -- bare land for boats
 	;
 
 DROP VIEW IF EXISTS dense_green;
@@ -373,16 +374,17 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'water'::varchar(30) AS material,
 	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE (tags->>'landuse'='basin' or 
-	tags->> 'natural' IN ('water', 'spring', 'waterway') or 
+    FROM polygons WHERE tags->>'landuse'='basin' OR 
+	tags->> 'natural' IN ('water', 'spring', 'waterway') OR 
 	tags->> 'waterway' IN ('river', 'stream', 'tidal_channel', 'canal', 'drain', 'ditch', 'yes') or
-	tags->> 'water' <>'' or
-	tags->> 'water' <> 'intermittent' or
-	tags->> 'landuse' = 'basin' or
-	tags->> 'basin' = 'detention') and
-	(tags->> 'intermittent' <> 'yes' or --do not include anything that is seasonal/temporal
-	tags->> 'seasonal' <> 'yes' or
-	tags->> 'tidal' <> 'yes')
+	tags->> 'water' <>'' OR
+	tags->> 'waterway' <> 'boatyard' OR
+	tags->> 'water' <> 'intermittent' OR
+	tags->> 'landuse' = 'basin' OR
+	tags->> 'basin' = 'detention' AND
+	tags->> 'intermittent' <> 'yes' AND --do not include anything that is seasonal/temporal
+	tags->> 'seasonal' <> 'yes' AND
+	tags->> 'tidal' <> 'yes'
 	;
  
 DROP VIEW IF EXISTS parking_surface;
@@ -443,8 +445,9 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
     FROM polygons WHERE tags->>'landuse' IN ('institutional',  'education', 'religious', 'military') or
 	tags->> 'amenity' IN ('school', 'hospital', 'university','fast_food', 'clinic', 'theatre', 'conference_center', 
 	'place_of_worship', 'police') or
-	tags->> 'leisure' IN ('golf_course') or
-	tags->> 'healthcare' IN ('clinic', 'hospital')
+	tags->> 'leisure' IN ('golf_course', 'marina') or
+	tags->> 'healthcare' IN ('clinic', 'hospital')or
+	tags ->> 'tourism' = 'theme_park'
 	;
 
 
@@ -470,3 +473,32 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 	;
 
 
+DROP VIEW IF EXISTS waterways_bf;
+CREATE OR REPLACE VIEW waterways_bf AS
+SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 3*size))::geometry('MultiPolygon', 3857) AS geom 
+FROM
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+size, geom 
+FROM
+(
+SELECT way_id, feature, type, material,
+size , (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id,  
+	'waterways' AS feature, -- when water feature is a linestring instead of a polygon 
+	tags->>'waterway' AS type,
+	tags->>'water' AS material,
+	2 AS size,
+	geom AS geom
+    FROM lines WHERE tags->>'waterway' <>'' OR 
+	tags->>'water' <>'' AND
+	tags->> 'intermittent' <> 'yes' AND --do not include anything that is seasonal/temporal
+	tags->> 'seasonal' <> 'yes' AND
+	tags->> 'tidal' <> 'yes'
+		) t1
+	) t2
+	) t3
+	;
