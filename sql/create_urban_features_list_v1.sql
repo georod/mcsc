@@ -18,6 +18,10 @@ FROM
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'water' AS view FROM water
 )
 UNION ALL
+-- waterways
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'waterways_bf' AS view FROM waterways_bf
+)
+UNION ALL
 --barrier
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size, 'barrier_bf' AS view FROM barrier_bf
 )
@@ -69,6 +73,10 @@ UNION ALL
 UNION ALL
 -- hetero_green
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'hetero_green' AS view FROM hetero_green
+)
+UNION ALL
+-- bare_soil
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'bare_soil' AS view FROM bare_soil
 )
 UNION ALL
 -- open_green
