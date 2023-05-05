@@ -29,4 +29,4 @@ carn_small <- c("Eupleridae","Ailuridae","Hyaenidae","Mephitidae","Mustelidae","
 mammals_all <- mammals_all %>% mutate(order = ifelse(family %in% carn_big, "Carnivora_big", order))
 mammals_all <- mammals_all %>% mutate(order = ifelse(family %in% carn_small, "Carnivora_small", order))
 
-write.csv(, "GBIF_relevant_mammals_data.csv")
+write.csv(mammals_all, "GBIF_relevant_mammals_data.csv")
