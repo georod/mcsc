@@ -469,4 +469,32 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 	) t2
 	;
 
-
+DROP VIEW IF EXISTS waterways_bf;
+CREATE OR REPLACE VIEW waterways_bf AS
+SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 3*size))::geometry('MultiPolygon', 3857) AS geom 
+FROM
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+size, geom 
+FROM
+(
+SELECT way_id, feature, type, material,
+size , (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id,  
+	'waterways' AS feature, -- when water feature is a linestring instead of a polygon 
+	tags->>'waterway' AS type,
+	tags->>'water' AS material,
+	2 AS size,
+	geom AS geom
+    FROM lines WHERE tags->>'waterway' <>'' OR 
+	tags->>'water' <>'' AND
+	tags->> 'intermittent' <> 'yes' AND --do not include anything that is seasonal/temporal
+	tags->> 'seasonal' <> 'yes' AND
+	tags->> 'tidal' <> 'yes'
+		) t1
+	) t2
+	) t3
+	;
