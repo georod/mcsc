@@ -325,19 +325,34 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	NULL AS size,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'natural'IN('garden',
-	 'scrub', 'shrubbery', 'tundra', 'mud', 'dune','cliff',
+	 'scrub', 'shrubbery', 'tundra', 'cliff',
 	'shrub', 'wetland', 
-	'grassland', 'fell', 'heath','moor', 
-	'sand','scree','sinkhole', 'beach') or  -- these are bare non-concrete that can be called later from the material column
+	'grassland', 'fell', 'heath','moor') or
 	tags->> 'landuse'IN('plant_nursery', 
-	'meadow',  'flowerbed', 'wetland',
-	'brownfield', 'construction') or -- these are bare non-concrete that can be called later from the feature column
+	'meadow',  'flowerbed', 'wetland') or
 	tags->> 'meadow'<>'' or 
-	tags->> 'golf' IN ('rough','bunker') or -- bunker is bare non-concrete that can be called later from the size column
-	tags->> 'grassland' = 'prairie' or
-	tags->> 'waterway' = 'boatyard' -- bare land for boats
+	tags->> 'golf' IN ('rough') or -- bunker is bare non-concrete that can be called later from the size column
+	tags->> 'grassland' = 'prairie'
+
+
 	;
 
+DROP VIEW IF EXISTS bare_soil;
+CREATE OR REPLACE VIEW bare_soil AS -- these include all types of non-forest, non-lawn, it also includes bare non-concrete grown
+SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
+	'bare_soil'::varchar(30) AS feature,
+	tags->>'landuse'::varchar(30) AS type,
+	tags->>'natural'::varchar(30) AS material,
+	--tags->>'golf'::varchar(30) AS size,
+	NULL AS size,
+	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
+    FROM polygons WHERE tags->>'natural'IN('mud', 'dune',
+	'sand','scree','sinkhole', 'beach') or  -- these are bare non-concrete that can be called later from the material column
+	tags->> 'landuse'IN('brownfield', 'construction') or -- these are bare non-concrete that can be called later from the feature column
+	tags->> 'golf' IN ('bunker') or -- bunker is bare non-concrete that can be called later from the size column
+	tags->> 'waterway' = 'boatyard' -- bare land for boats
+	;
+	
 DROP VIEW IF EXISTS dense_green;
 CREATE OR REPLACE VIEW dense_green AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
@@ -471,6 +486,7 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 	) t1
 	) t2
 	;
+
 
 DROP VIEW IF EXISTS waterways_bf;
 CREATE OR REPLACE VIEW waterways_bf AS
