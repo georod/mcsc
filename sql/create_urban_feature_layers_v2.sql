@@ -333,6 +333,8 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->> 'meadow'<>'' or 
 	tags->> 'golf' IN ('rough') or -- bunker is bare non-concrete that can be called later from the size column
 	tags->> 'grassland' = 'prairie'
+
+
 	;
 
 DROP VIEW IF EXISTS bare_soil;
