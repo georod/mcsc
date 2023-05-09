@@ -1,7 +1,7 @@
 city,osm_city_name,admin_level,osm_id,buffer
 Atlanta,Atlanta,4,119557,35
-"Berkeley, CA",Berkeley,8,2833528,10
-"Boston, MA",Boston,8,2315704,35
+Berkeley,Berkeley CA,8,2833528,10
+Boston,Boston MA,8,2315704,35
 Chicago,Chicago,8,122604,46
 DFW,Fort Worth,8,115274,10
 Edmonton,Edmonton,6,2564500,10
@@ -11,7 +11,7 @@ Houston,Houston,8,2688911,15
 Little Rock,Little Rock,8,111147,10
 Manchester,Manchester,8,305467,25
 Mexico City,Mexico,,1376330,30
-"National Capital Area, Maryland",Maryland,4,162112,10
+National Capital Area,Maryland,4,162112,10
 New York,City of New York,5,175905,35
 Pasadena,Pasadena,8,3529725,10
 Phoenix,Phoenix,8,111257,45
@@ -24,3 +24,4 @@ Toronto,Toronto,6,324211,10
 Urbana,Urbana,,126133,25
 Vancouver,Vancouver,,1852574,10
 Wilmington,Wilmington,,369472,15
+Peterborough,Peterborough,,7473849,2
