@@ -1,0 +1,25 @@
+copernicus,value,mcsc,mcsc_value
+Arable land (annual crops),1,resourceful_green_area,8
+Continuous urban fabric (SL>80),2,developed_na,28
+Discontinuous dense urban fabric (SL:50%),3,developed_na,28
+Pastures,4,open_green_area,6
+Permanent crops,5,resourceful_green_area,8
+"Industrial, commercial, public, military",6,commercial,2
+Roads,7,roads_na_traffic,17
+Isolated structures,8,building,14
+Railways,9,rails,25
+Discontinuous medium density urban fabric,10,developed_na,28
+Airports,11,institutional,3
+Sports and leisure facilities,12,institutional,3
+Mineral extraction,13,bare_soil,10
+Discontinuous low density urban fabric,14,developed_na,28
+Forests,15,dense_green_area,11
+Discontinuous very low density urban fabric,16,developed_na,28
+Green urban areas,17,open_green_area,6
+Land without current use,18,bare_soil,10
+Water,19,water,12
+Construction sites,20,bare_soil,10
+Herbaceous vegetation associations (natural),21,hetero_green_area,9
+Open spaces with little or no vegetation (bare),22,bare_soil,10
+Fast transit roads and associated land,23,roads_vh_traffic,15
+wetlands,24,hetero_green_area,9

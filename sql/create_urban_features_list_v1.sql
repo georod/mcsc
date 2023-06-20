@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-02-07
+-- 2023-04-14
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -18,12 +18,16 @@ FROM
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'water' AS view FROM water
 )
 UNION ALL
+-- waterways
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'waterways_bf' AS view FROM waterways_bf
+)
+UNION ALL
 --barrier
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size, 'barrier_bf' AS view FROM barrier_bf
 )
 UNION ALL
 --roads
-(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size, 'lf_roads_notraffic_bf' AS view FROM lf_roads_notraffic_bf
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size, 'lf_roads_no_traffic_bf' AS view FROM lf_roads_no_traffic_bf
 )
 UNION ALL
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size, 'lf_roads_very_low_traffic_bf' AS view FROM lf_roads_very_low_traffic_bf
@@ -71,8 +75,16 @@ UNION ALL
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'hetero_green' AS view FROM hetero_green
 )
 UNION ALL
+-- bare_soil
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric, 'bare_soil' AS view FROM bare_soil
+)
+UNION ALL
 -- open_green
 (SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric,  'open_green' AS view FROM open_green
+)
+UNION ALL
+-- protected area
+(SELECT feature, CASE WHEN type is null then 'NULL' else type END AS type, material, size::numeric,  'protected_area' AS view FROM protected_area
 )
 UNION ALL
 -- residential
@@ -96,4 +108,4 @@ UNION ALL
 
 ALTER TABLE urban_features_v1 ADD CONSTRAINT urban_features_v1_pkey PRIMARY KEY (rid);
 
-COMMENT ON TABLE urban_features_v1 IS 'Master list of features defined for Ontario. This list will be used as the references for the study. [2023-02-07]';
+COMMENT ON TABLE urban_features_v1 IS 'Master list of features defined for Ontario. This list will be used as the references for the study. [2023-04-17]';

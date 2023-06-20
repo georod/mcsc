@@ -166,11 +166,14 @@ df_unique_res <- df_unique %>%
   mutate(priority = ifelse(feature == "linear_feature_rail" & type == 'tram', 23, priority))%>% ## this layer did not appear, should debug code
   ##pedestrian roads #allows for overpasses and underpasses by being set with higher priority as roads
   mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material != 'sidewalk', 24, priority))%>% ### sidewalks.
+  #mutate(priority = ifelse(feature == "linear_feature_no_traffic" & (material != 'sidewalk' | is.na(material)), 24, priority))%>% ### sidewalks. #PR
 
   #mutate(priority = ifelse(feature == "linear_feature_no_traffic" & material == 'sidewalk', 20, priority))%>%
   ##railways
   mutate(priority = ifelse(feature == "linear_feature_rail", 25, priority))%>%
   mutate(priority = ifelse(feature == "linear_feature_rail" & (type %in% c('abandoned','disused','construction') | material == 'construction'), 26, priority))%>%
+  #mutate(priority = ifelse(feature == "linear_feature_rail" & type %in% c('abandoned','disused','construction') , 26, priority))%>%
+  #mutate(priority = ifelse(feature == "linear_feature_rail" & material == 'construction', 26, priority))%>%
   ##barriers (too thin to appear on 30m resolution layer, useful for other purposes) 
   mutate(priority = ifelse(feature == "barrier", 27, priority)) ## the
 

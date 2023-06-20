@@ -1,5 +1,5 @@
 --Multicity structural Connectivity Project (MCSC)
--- 2023-04-04
+-- 2023-06-19
 -- This is version create_urban_feature_layers_v4.sql
 -- Code Authors:
 -- Tiziana Gelmi-Candusso, Peter Rodriguez
@@ -8,6 +8,7 @@
 
 -- Note: This version also create buffers for linear features to help processing
 
+
 DROP VIEW IF EXISTS buildings;
 CREATE OR REPLACE VIEW buildings AS --Tiziana added tags here, took out amenity because those are the whole property not the building, these will go to institutional
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
@@ -15,6 +16,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'building'::varchar(30) AS type,
 	''::varchar(30) AS material,
 	NULL AS size, --has feet and meter, a bit of a mess tbh, do not use
+	14 AS pri, -- priority field
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'building' <>'' or 
 	tags->>'building' IN ('hospital', 'parking','industrial', 'school', 'commercial', 'terrace', 'detached', 'semideatched_house', 'house', 'retail', 'hotel', 'apartments', 'yes', 'airport', 'university') or 
@@ -22,36 +24,68 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->> 'aeroway' IN ('terminal') -- airports terminals were recognized as buildings
 	;
 	
-COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-04-04]';
+COMMENT ON VIEW buildings  IS 'OSM buildings spatial layer. [2023-06-19]';
 
 
 ---Tiziana is creating more layers for the linear features, based on traffic load and human activity. 
 --no traffic roads does not contian sidewalks
-DROP VIEW IF EXISTS lf_roads_notraffic_bf;
+--DROP VIEW IF EXISTS lf_roads_notraffic_bf;
 DROP VIEW IF EXISTS lf_roads_no_traffic_bf;
 CREATE OR REPLACE VIEW lf_roads_no_traffic_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size, pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size, pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size , pri,  (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
 	'linear_feature_no_traffic' AS feature, -- predestrian and cycling trails, includes hiking trails and paveways
 	tags->>'highway' AS type,
 	tags->>'footway' AS material,
-	0.5 AS size,
+	0.5 AS size,	
+	24 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('footway','construction','escape',
 	'cycleway','steps','bridleway','path','pedestrian','track',
 	'abandoned','bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 
-	'bus and cyclists') or  --it was and tags ->> 'footway' <> 'sidewalk' for excluding sidewalks
+	'bus and cyclists') AND  --it was and tags ->> 'footway' <> 'sidewalk' for excluding sidewalks
+	tags ->> 'footway' <> ('sidewalk') -- bostons finds a problem with these, let's try reintegrating them but a different overlay order so buildings and other roads appear over them.
+		) t1
+	) t2
+	) t3
+	; 
+
+DROP VIEW IF EXISTS lf_roads_no_traffic_bf_sidewalks;
+CREATE OR REPLACE VIEW lf_roads_no_traffic_bf_sidewalks AS
+SELECT sid, way_id, feature, type, material, size, pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+FROM
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+size, pri, geom 
+FROM
+(
+SELECT way_id, feature, type, material,
+size , pri, (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id,  
+	'linear_feature_no_traffic_sidewalks' AS feature, -- predestrian and cycling trails, includes hiking trails and paveways
+	tags->>'highway' AS type,
+	tags->>'footway' AS material,
+	0.5 AS size,	
+	16 AS pri, -- priority field
+	geom AS geom
+    FROM lines WHERE tags ->> 'highway' IN ('footway','construction','escape',
+	'cycleway','steps','bridleway','path','pedestrian','track',
+	'abandoned','bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 
+	'bus and cyclists') AND  --it was and tags ->> 'footway' <> 'sidewalk' for excluding sidewalks
 	tags ->> 'footway' IN ('sidewalk') -- bostons finds a problem with these, let's try reintegrating them but a different overlay order so buildings and other roads appear over them.
 		) t1
 	) t2
@@ -60,23 +94,24 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_very_low_traffic_bf; 
 CREATE OR REPLACE VIEW lf_roads_very_low_traffic_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size, pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size, pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size , pri, (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
 	'linear_feature_vl_traffic' AS feature, -- laneways, and roads where there is regularly no traffic, but is specific for vehicles
 	tags->>'highway' AS type,
 	tags->>'surface' AS material,
-	1 AS size,
+	1 AS size,	
+	18 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('services','service','turning_loop','living_street') --
 		) t1
@@ -86,23 +121,24 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_low_traffic_bf;
 CREATE OR REPLACE VIEW lf_roads_low_traffic_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size, pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size,  pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size,  pri, (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
 	'linear_feature_l_traffic' AS feature, -- roads where there is local resident traffic mainly, predominantly low spee
 	tags->>'highway' AS type,
 	tags->>'surface' AS material,
-	2 AS size,
+	2 AS size,	
+	19 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('residential', 'rest_area', 'busway')
 		) t1
@@ -112,16 +148,16 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_medium_traffic_bf; -- there is an ongoing effort at osm to categorize streets consitently, so until that happens across states, the following will have to be double check that the roads reflect the actual traffic load
 CREATE OR REPLACE VIEW lf_roads_medium_traffic_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size,  pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size,  pri,  (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
@@ -129,6 +165,7 @@ SELECT way_id,
 	tags->>'highway' AS type,
 	tags->>'surface' AS material,
 	2 AS size,
+	20 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('tertiary', ' tertiary_link')
 		) t1
@@ -138,16 +175,16 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_high_traffic_ls_bf;
 CREATE OR REPLACE VIEW lf_roads_high_traffic_ls_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size,  pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size,  pri, (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
@@ -155,6 +192,7 @@ SELECT way_id,
 	tags->>'highway' AS type,
 	tags->>'surface' AS material,
 	3 AS size,
+	21 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('primary', 'primary_link', 'secondary', 'secondary_link')
 		) t1
@@ -164,16 +202,16 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_high_traffic_hs_bf;
 CREATE OR REPLACE VIEW lf_roads_high_traffic_hs_bf AS 
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size,  pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size, pri,  (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
@@ -181,6 +219,7 @@ SELECT way_id,
 	tags->>'highway' AS type,
 	tags->>'surface' AS material,
 	6 AS size,
+	22 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('trunk', 'trunk_link')
 		) t1
@@ -190,16 +229,16 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_very_high_traffic_bf;
 CREATE OR REPLACE VIEW lf_roads_very_high_traffic_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size,  pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size, pri,  (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
@@ -207,6 +246,7 @@ SELECT way_id,
 	tags->>'highway' AS type,
 	tags->>'surface' AS material,
 	4 AS size,
+	15 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags ->> 'highway' IN ('motorway','motorway_link', 'motorway_junction')
 		) t1
@@ -216,16 +256,16 @@ SELECT way_id,
 
 DROP VIEW IF EXISTS lf_roads_unclassified_bf;
 CREATE OR REPLACE VIEW lf_roads_unclassified_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size,  pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size, pri,  (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
@@ -233,6 +273,7 @@ SELECT way_id,
 	tags->>'highway' AS type,
 	tags->>'footway' AS material,
 	2 AS size,
+	17 AS pri, -- priority field
 	geom AS geom
     FROM lines WHERE tags->>'highway' <>'' AND tags ->> 'highway' NOT IN (
         'footway','construction','escape','cycleway','steps','bridleway','construction','path','pedestrian','track','abandoned',
@@ -249,9 +290,9 @@ SELECT way_id,
 	) t3
 	;
 
-DROP VIEW IF EXISTS lf_rails_bf;
-CREATE OR REPLACE VIEW lf_rails_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom  
+DROP VIEW IF EXISTS lf_rails_bf_abandoned;
+CREATE OR REPLACE VIEW lf_rails_bf_abandoned AS
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom  
 FROM 
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
@@ -260,10 +301,77 @@ CASE
 WHEN type = 'rail' THEN 2
 --WHEN type = 'proposed' THEN 0 -- proposed is not in the layer anymore, and the rest of the noise isnt either
 ELSE 1
-END::smallint AS size, (geom)::geometry(LineString, 3857) AS geom
+END::smallint AS size,  pri, (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
-SELECT way_id, feature, type, material, size,
+SELECT way_id, feature, type, material, size,  pri, 
+	--REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size,
+ geom
+FROM
+(
+SELECT way_id,  
+	'linear_feature_rail_abandoned' AS feature, --noting tram is included here, we might need to separate it as there ir a bug later giving an output where they show up as rails
+	tags->>'railway' AS type,
+	tags->>'highway' AS material,
+	NULL AS size,
+	26 AS pri, -- priority field
+	geom  AS geom
+	FROM lines WHERE tags->>'railway' IN ('abandonded','construction','disused' -- tags for abandoned rails
+	) or --or tags->> 'landuse' = 'railway' -- here I changed to IN only those tags
+	tags->> 'highway'='construction' -- tags for highways without vehicular traffic
+		) t1
+	) t2
+	) t3
+	;
+	
+DROP VIEW IF EXISTS lf_rails_bf_trams;
+CREATE OR REPLACE VIEW lf_rails_bf_trams AS
+SELECT sid, way_id, feature, type, material, size,  pri, st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom  
+FROM 
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+CASE
+WHEN type = 'rail' THEN 2
+--WHEN type = 'proposed' THEN 0 -- proposed is not in the layer anymore, and the rest of the noise isnt either
+ELSE 1
+END::smallint AS size,  pri, (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id, feature, type, material, size, pri, 
+	--REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size,
+ geom
+FROM
+(
+SELECT way_id,  
+	'linear_feature_rail_trams' AS feature, --noting tram is included here, we might need to separate it as there ir a bug later giving an output where they show up as rails
+	tags->>'railway' AS type,
+	tags->>'highway' AS material,
+	NULL AS size,
+	23 AS pri, -- priority field
+	geom  AS geom
+	FROM lines WHERE tags->>'railway' IN ('tram') --or tags->> 'landuse' = 'railway' -- here I changed to IN only those tags
+	--tags->> 'highway'='construction' -- tags for highways without vehicular traffic, should this go on bare_soil?
+		) t1
+	) t2
+	) t3
+	;
+	
+DROP VIEW IF EXISTS lf_rails_bf;
+CREATE OR REPLACE VIEW lf_rails_bf AS
+SELECT sid, way_id, feature, type, material, size, pri,  st_multi(st_buffer(geom, 6*size))::geometry('MultiPolygon', 3857) AS geom  
+FROM 
+(
+SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
+feature::varchar(30), type::varchar(30), material::varchar(30), 
+CASE
+WHEN type = 'rail' THEN 2
+--WHEN type = 'proposed' THEN 0 -- proposed is not in the layer anymore, and the rest of the noise isnt either
+ELSE 1
+END::smallint AS size,  pri, (geom)::geometry(LineString, 3857) AS geom
+FROM
+(
+SELECT way_id, feature, type, material, size, pri, 
 	--REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g') AS size,
  geom
 FROM
@@ -273,10 +381,11 @@ SELECT way_id,
 	tags->>'railway' AS type,
 	tags->>'highway' AS material,
 	NULL AS size,
+	25 AS pri, -- priority field
 	geom  AS geom
-	FROM lines WHERE tags->>'railway' IN ('abandonded','construction','disused', -- tags for abandoned rails
-	'light_rail','narrow_gauge','rail','preserved','tram') or --or tags->> 'landuse' = 'railway' -- here I changed to IN only those tags
-	tags->> 'highway'='construction' -- tags for highways without vehicular traffic
+	FROM lines WHERE tags->>'railway' IN (--'abandonded','construction','disused', -- tags for abandoned rails
+	'light_rail','narrow_gauge','rail','preserved') --,'tram') or --or tags->> 'landuse' = 'railway' -- here I changed to IN only those tags
+	--tags->> 'highway'='construction' -- tags for highways without vehicular traffic
 		) t1
 	) t2
 	) t3
@@ -289,6 +398,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'natural'::varchar(30) AS material,
 	NULL AS size,
+	6 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse' IN ('park','grass', 'cemetery', 
 	'greenfield', 'recreation_ground', 'winter_sports') or -- recreation ground does not necessarily include open-green
@@ -308,6 +418,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'natural'::varchar(30) AS material,
 	NULL AS size,
+	7 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags ->> 'leisure' = 'nature_riserve' or  
 	tags->> 'boundary' IN ('protected_area', 'national_park') or
@@ -323,6 +434,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'natural'::varchar(30) AS material,
 	--tags->>'golf'::varchar(30) AS size,
 	NULL AS size,
+	9 AS pri, 
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'natural'IN('garden',
 	 'scrub', 'shrubbery', 'tundra', 'cliff',
@@ -333,8 +445,6 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->> 'meadow'<>'' or 
 	tags->> 'golf' IN ('rough') or -- bunker is bare non-concrete that can be called later from the size column
 	tags->> 'grassland' = 'prairie'
-
-
 	;
 
 DROP VIEW IF EXISTS bare_soil;
@@ -345,6 +455,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'natural'::varchar(30) AS material,
 	--tags->>'golf'::varchar(30) AS size,
 	NULL AS size,
+	10 AS pri, 
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'natural'IN('mud', 'dune',
 	'sand','scree','sinkhole', 'beach') or  -- these are bare non-concrete that can be called later from the material column
@@ -360,6 +471,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'leaf_type'::varchar(30) AS material,
 	NULL AS size,
+	11 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse'IN('forest') or 
 	tags->>'natural'='wood' or 
@@ -373,6 +485,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'natural'::varchar(30) AS material,
 	NULL AS size,
+	8 AS pri, 
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse' IN ('orchard','farmland', 
 	'landfill','vineyard', 'farmyard', 'allotments', 'allotment', 'farmland') or
@@ -388,6 +501,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'water'::varchar(30) AS material,
 	NULL AS size,
+	12 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse'='basin' OR 
 	tags->> 'natural' IN ('water', 'spring', 'waterway') OR 
@@ -409,6 +523,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'amenity'::varchar(30) AS type,
 	''::varchar(30) AS material,
 	NULL AS size,
+	13 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'parking'='surface' or
 	tags->> 'aeroway' IN ('runway', 'apron') 
@@ -421,6 +536,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'residential'::varchar(30) AS type,
 	''::varchar(30) AS material,
 	NULL AS size,
+	4 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse'='residential'
 	;
@@ -432,20 +548,34 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'railway'::varchar(30) AS type,
 	''::varchar(30) AS material,
 	NULL AS size,
+	5 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse'='railway'
 	;
 
-DROP VIEW IF EXISTS commercial_industrial;
-CREATE OR REPLACE VIEW commercial_industrial AS
+DROP VIEW IF EXISTS commercial;
+CREATE OR REPLACE VIEW commercial AS
 SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
-	'commercial_industrial'::varchar(30) AS feature,
+	'commercial'::varchar(30) AS feature,
 	tags->>'landuse'::varchar(30) AS type,
 	tags->>'retail'::varchar(30) AS material,
 	--tags->>'industrial'::varchar(30) AS size,
 	NULL AS size,
+	2 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE tags->>'landuse' IN ('commercial',  'retail', 'industrial', 'fairground') or
+    FROM polygons WHERE tags->>'landuse' IN ('commercial',  'retail')--, 'industrial', 'fairground') or
+	--tags->> 'industrial' IN ('factory') -- extract from size = factory as industrial 
+	;
+CREATE OR REPLACE VIEW industrial AS
+SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),  
+	'industrial'::varchar(30) AS feature,
+	tags->>'landuse'::varchar(30) AS type,
+	tags->>'retail'::varchar(30) AS material,
+	--tags->>'industrial'::varchar(30) AS size,
+	NULL AS size,
+	1 AS pri,
+	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
+    FROM polygons WHERE tags->>'landuse' IN ('industrial', 'fairground') or
 	tags->> 'industrial' IN ('factory') -- extract from size = factory as industrial 
 	;
 
@@ -456,6 +586,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	tags->>'landuse'::varchar(30)  AS type,
 	''::varchar(30) AS material,
 	NULL AS size,
+	3 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
     FROM polygons WHERE tags->>'landuse' IN ('institutional',  'education', 'religious', 'military') or
 	tags->> 'amenity' IN ('school', 'hospital', 'university','fast_food', 'clinic', 'theatre', 'conference_center', 
@@ -468,11 +599,11 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 
 DROP VIEW IF EXISTS barrier_bf;
 CREATE OR REPLACE VIEW barrier_bf AS	
-SELECT sid, way_id, feature, type, material,  size, st_multi(st_buffer(geom, 1))::geometry('MultiPolygon', 3857) AS geom
+SELECT sid, way_id, feature, type, material,  size,  pri, st_multi(st_buffer(geom, 1))::geometry('MultiPolygon', 3857) AS geom
 FROM
 (
 SELECT sid, way_id, feature, type, material, 
-NULLIF(REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g'),'')::numeric AS size, geom
+NULLIF(REGEXP_REPLACE(left(REGEXP_REPLACE(size, '[[:alpha:]]', '', 'g'),2), '[^\w]+','', 'g'),'')::numeric AS size,  pri, geom
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),  
@@ -481,6 +612,7 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 	tags->>'fence_type'::varchar(30) AS material,
 	--tags->>'height'::varchar(30) AS size,
 	NULL AS size,
+	27 AS pri,
 	geom AS geom
     FROM lines WHERE tags->>'barrier' <>''
 	) t1
@@ -490,16 +622,16 @@ SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20),
 
 DROP VIEW IF EXISTS waterways_bf;
 CREATE OR REPLACE VIEW waterways_bf AS
-SELECT sid, way_id, feature, type, material, size, st_multi(st_buffer(geom, 3*size))::geometry('MultiPolygon', 3857) AS geom 
+SELECT sid, way_id, feature, type, material, size, pri, st_multi(st_buffer(geom, 3*size))::geometry('MultiPolygon', 3857) AS geom 
 FROM
 (
 SELECT (row_number() OVER ())::int AS sid, way_id::varchar(20), 
 feature::varchar(30), type::varchar(30), material::varchar(30), 
-size, geom 
+size, pri, geom 
 FROM
 (
 SELECT way_id, feature, type, material,
-size , (geom)::geometry(LineString, 3857) AS geom
+size , pri, (geom)::geometry(LineString, 3857) AS geom
 FROM
 (
 SELECT way_id,  
@@ -507,6 +639,7 @@ SELECT way_id,
 	tags->>'waterway' AS type,
 	tags->>'water' AS material,
 	2 AS size,
+	12 AS pri,
 	geom AS geom
     FROM lines WHERE tags->>'waterway' <>'' OR 
 	tags->>'water' <>'' AND
