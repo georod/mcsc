@@ -1,27 +1,35 @@
-city,osm_city_name,admin_level,osm_id,buffer
-Atlanta,Atlanta,4,119557,35
-Berkeley,Berkeley CA,8,2833528,10
-Boston,Boston MA,8,2315704,35
-Chicago,Chicago,8,122604,46
-DFW,Fort Worth,8,115274,10
-Edmonton,Edmonton,6,2564500,10
-Fort Collins,Fort Collins,8,112524,20
-Freiburg,Freiburg im Breisgau,6,62768,10
-Houston,Houston,8,2688911,15
-Little Rock,Little Rock,8,111147,10
-Manchester,Manchester,8,305467,25
-Mexico City,Mexico,,1376330,30
-National Capital Area,Maryland,4,162112,10
-New York,City of New York,5,175905,35
-Pasadena,Pasadena,8,3529725,10
-Phoenix,Phoenix,8,111257,45
-Pomona,Pomona,8,1532363,10
-Salt Lake City,Salt Lake City,,198770,35
-Saskatoon,Saskatoon,,4189345,10
-St. Louis,St Louis,,1180533,30
-Syracuse,Syracuse,,174916,15
-Toronto,Toronto,6,324211,10
-Urbana,Urbana,,126133,25
-Vancouver,Vancouver,,1852574,10
-Wilmington,Wilmington,,369472,15
-Peterborough,Peterborough,,7473849,2
+,osm_city,State,osm_id,buffer
+1,Wilmington,Delaware,369472,15
+2,Edmonton,Alberta,2564500,10
+3,Phoenix,Arizona,111257,45
+4,Little Rock,Arkansas,111147,10
+5,Freiburg,"Baden-Württemberg, Germany",62768,10
+6,Vancouver,BC,1852574,10
+7,Berkeley,California,2833528,10
+8,Pasadena,California,3529725,10
+9,Pomona,California,1532363,10
+10,Fort Collins,Colorado,112524,20
+11,Atlanta,Georgia,119557,35
+12,Chicago,Illinois,122604,46
+13,Urbana,Illinois,126133,25
+14,National Capital Area,Maryland,162112,10
+15,Boston,Massachusetts,2315704,35
+16,Mexico City,Mexico,1376330,30
+17,St. Louis,Missouri,1180533,30
+18,Manchester,New Hampshire,305467,25
+19,New York,New York,175905,35
+20,Syracuse,New York,174916,15
+21,Albany,New York,175549,15
+22,Raleigh,North Carolina,179052,2
+23,Toronto,Ontario,324211,10
+24,Peterborough,Ontario,7473849,2
+25,Saskatoon,Saskatchewan,4189345,10
+26,DFW,Texas,115274,10
+27,Houston,Texas,2688911,15
+28,Salt Lake City,Utah,198770,35
+29,Woodbury_NY,New York,175473,25
+30,San Diego,California,396482,60
+31,Aromas,California,33175053,8
+32,San Jose CA,California,112143,5
+33,Calgary,Alberta,3227127,1
+34,Athens,Georgia,119353,5
