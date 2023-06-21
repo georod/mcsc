@@ -271,9 +271,9 @@ for (k in 1:length(city)) {
    ", city[k],"_env", " t2
   ON st_intersects(t1.geom,t2.geom)) t3;")
       
-      vectorEnv <- vect(st_read(con_pg, query=queryEnv))
+      vectorEnv <- terra::vect(st_read(con_pg, query=queryEnv))
       
-      raster1 <- rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
+      raster1 <- terra::rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
       
       #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
       
@@ -285,7 +285,7 @@ for (k in 1:length(city)) {
       { print("empty vector")} else
         
       {
-        rasterRes1 <- rasterize(vectorUrFts, raster1, field="class", background=NA, touches=FALSE,
+        rasterRes1 <- terra::rasterize(vectorUrFts, raster1, field="class", background=NA, touches=FALSE,
                                 update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
         
         dir.create(paste0(outF,"lcrasters"))
@@ -306,6 +306,7 @@ for (k in 1:length(city)) {
 # disconnect from db
 dbDisconnect(con_pg)
 
+print("done individual raster layers")
 
 #end.time <- Sys.time()
 #time.taken <- end.time - start.time
@@ -333,9 +334,9 @@ for (k in 1:length(city)) {
   priOrd <- priOrd[order(-priOrd$priority),] #reverse order
   priOrd$order <- 1:nrow(priOrd)
   
-  r1 <- rast(priOrd$rasterFiles)
+  r1 <- terra::rast(priOrd$rasterFiles)
   
-  r3 <- app(r1, fun='first', na.rm=TRUE)
+  r3 <- terra::app(r1, fun='first', na.rm=TRUE)
   
   #r3 <- subst(r2, NA, 50)
   #r3 <- r2
