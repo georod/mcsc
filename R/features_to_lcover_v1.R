@@ -172,6 +172,8 @@ for (k in 1:length(city)) {
     "SELECT DISTINCT feature, type, material, size, view, row_number() OVER (ORDER BY view, feature) AS rid FROM (", sqlUnion1, ") t1;") )
   
   
+  print("union part done")
+  
   #----------------------------------
   # Create city specific priority df
   #----------------------------------
@@ -216,7 +218,7 @@ for (k in 1:length(city)) {
   
   df_unique_res$class <- df_unique_res$priority
   #View(df_unique_res)
-  df_unique_res$priority<-as.numeric(df_unique_res$priority)
+  df_unique_res$priority <- as.numeric(df_unique_res$priority)
   
  
   df1 <- df_unique_res[,c('feature', 'type', 'view', 'priority')]
@@ -230,6 +232,8 @@ for (k in 1:length(city)) {
   
   # large_mammals (Only need to create land cover with largeMam or smallMam but not both as they both have the same class values)
   df1 <- df1[!is.na(df1$priority),]
+  
+   print("priority part done")
   
   largeMam <- df1 %>% select("feature", "type", "view", "priority") # We should call this largeMam obj something else to avoid confusion
   
