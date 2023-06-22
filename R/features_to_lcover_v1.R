@@ -69,6 +69,7 @@ priority_table <- read.csv('./misc/priority_table_v2.csv')
 cec <- read.csv('./misc/cec_north_america.csv')
 cop <- read.csv('./misc/copernicus_reclassification_table.csv') 
 
+city <- read.csv("./misc/mcsc_city_list1.csv")
 
 #=================================
 # Connect to PG db - STEP 2
@@ -110,21 +111,13 @@ con_pg <- DBI::dbConnect(
 #=========================================================
 
 #select which cities to run
-#city <- c('Mexico')
-#city <- c('Toronto', 'City_of_New_York', 'Atlanta', 'Berkeley', 'Boston', 'Fort_Worth', 'Edmonton', 'Fort_Collins', 'Houston','Little_Rock', 'Manchester', 'Maryland', 'Pasadena', 'Phoenix', 'Pomona', 'Salt_Lake_City', 'Saskatoon', 'St_Louis', 'Syracuse', 'Vancouver', 'Wilmington', 'Urbana', 'Mexico')
-#city <- c('Vancouver', 'Wilmington', 'Urbana')
-#city <- c('Little_Rock', 'Manchester', 'Maryland', 'Pasadena', 'Phoenix', 'Pomona', 'Salt_Lake_City', 'Saskatoon', 'St_Louis', 'Syracuse', 'Vancouver', 'Wilmington', 'Urbana')
-#city <- c('Toronto', 'City_of_New_York', 'Atlanta', 'Berkeley', 'Boston', 'Fort_Worth', 'Edmonton', 'Fort_Collins', 'Houston')
-#city <- c('Toronto', 'City_of_New_York', 'Fort_Collins') 
-#city <- c('Toronto')
-#city <- c('Toronto','Peterborough')
-#city <- c('Chicago', 'Boston')
-#city <- c('City_of_New_York')
-#city <- c('City_of_New_York', 'Chicago')
-#city <- c('Fort_Collins')
-#city <- c('City_of_New_York', 'Fort_Collins', 'Chicago')
-city <- c('Peterborough')
-#city <- c('Peterborough', 'Brantford')
+#city <- c('Peterborough')
+city <- c('Toronto','Syracuse')
+
+# New city 
+#city <- city[!is.na(city$osm_id),]
+#city$pg_city <- gsub(" ", "_", city$osm_city)
+#city <- city$pg_city[-c(20,23,24)] # Removing Peterborough, Toronto, & Syracuse
 
 
 # SQL code to create city specific urban features.
@@ -250,11 +243,11 @@ for (k in 1:length(city)) {
   
   for (i in 1:length(featUrb)) {
     
-    vals <- sqldf(paste0("SELECT distinct priority FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority;"))
+    vals <- sqldf::sqldf(paste0("SELECT distinct priority FROM largeMam WHERE view='", featUrb[i],"' ORDER BY priority;"))
     
     for (j in 1:nrow(vals)) {
       
-      sqlPrimer <- sqldf(paste0("SELECT distinct feature, type, priority, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=", vals$priority[j], " ;"))
+      sqlPrimer <- sqldf::sqldf(paste0("SELECT distinct feature, type, priority, view FROM largeMam WHERE view='", featUrb[i],"' AND priority=", vals$priority[j], " ;"))
       
       
       queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
@@ -278,7 +271,7 @@ for (k in 1:length(city)) {
       
       raster1 <- terra::rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
 	  
-	  print(paste("feature", i))
+	  print(paste("done feature", featUrb[i]))
       
       #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
       
@@ -296,7 +289,7 @@ for (k in 1:length(city)) {
         dir.create(paste0(outF,"lcrasters"))
         dir.create(paste0(outF,"lcrasters/",city[k]))
         
-        writeRaster(rasterRes1, paste0(outF,"lcrasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$priority[1],".tif"), overwrite=TRUE)
+        terra::writeRaster(rasterRes1, paste0(outF,"lcrasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$priority[1],".tif"), overwrite=TRUE)
         
       }
       
@@ -347,7 +340,7 @@ for (k in 1:length(city)) {
   #r3 <- r2
   
   dir.create(paste0(outF,"lcrasters/",city[k],"/output"))
-  writeRaster(r3, paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'), overwrite=TRUE)
+  terra::writeRaster(r3, paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'), overwrite=TRUE)
   
 }
 
