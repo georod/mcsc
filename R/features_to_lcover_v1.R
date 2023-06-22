@@ -2,7 +2,7 @@
 # Multi-city structural Connectivity Project
 #============================================
 
-# 2023-06-19
+# 2023-06-22
 # Code Authors:
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -39,10 +39,9 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("C:/Users/tizge/Documents/StructuralconnectivityDB/")
 
 # project output folder
-#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test2/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test3/"
 #project output on server
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
-#res <- 'res_SM'
 
 ## loop creates both resistance maps anyways
 outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/mammals/"
@@ -65,7 +64,7 @@ view_table <- read.csv('./misc/reference_all_views.csv', header=TRUE)
 # table with the priority, resistance and source strength
 priority_table <- read.csv('./misc/priority_table_v2.csv')
 
-resTab <- read.csv("./misc/priority_table_v2.csv")
+#resTab <- read.csv("./misc/priority_table_v2.csv")
 #tables with the classes included in the Global landcover and their equivalence to our OSM-derived landcover classes
 cec <- read.csv('./misc/cec_north_america.csv')
 cop <- read.csv('./misc/copernicus_reclassification_table.csv') 
@@ -76,12 +75,12 @@ cop <- read.csv('./misc/copernicus_reclassification_table.csv')
 #=================================
 # add username and pwd to .Renviron
 # con_pg <- DBI::dbConnect(
-  # drv = RPostgres::Postgres(),
-  # host = "localhost",
-  # port = 5432,
-  # dbname = "osm",
-  # user = Sys.getenv("username"),
-  # password = Sys.getenv("pwd")
+# drv = RPostgres::Postgres(),
+# host = "localhost",
+# port = 5432,
+# dbname = "osm",
+# user = Sys.getenv("username"),
+# password = Sys.getenv("pwd")
 # )
 
 
@@ -144,7 +143,7 @@ pg_views1 <- view_vector ## from previous R document (priority_table generating 
 
 
 #priority_table <- read.csv('misc/priority_table_v1.csv') %>% select(-X)
-priority_table_red <- priority_table %>% select(priority, res_LM, res_SM, source_strength)
+priority_table_red <- priority_table %>% dplyr::select(priority, res_LM, res_SM, source_strength)
 
 #k <- 1
 
@@ -235,7 +234,7 @@ for (k in 1:length(city)) {
   
    print("priority part done")
   
-  largeMam <- df1 %>% select("feature", "type", "view", "priority") # We should call this largeMam obj something else to avoid confusion
+  largeMam <- df1 %>% dplyr::select("feature", "type", "view", "priority") # We should call this largeMam obj something else to avoid confusion
   
   featUrb <- unique(df1$view) 
   
@@ -279,7 +278,7 @@ for (k in 1:length(city)) {
       
       raster1 <- terra::rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
 	  
-	  print(paste("layers", nlyr(raster1)))
+	  print(paste("feature", i))
       
       #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
       
