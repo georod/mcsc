@@ -236,6 +236,8 @@ for (k in 1:length(city)) {
   
   #saveRDS(df1, paste0(outF, "/", city[k],"/","misc", "/","df1"))
   
+  detach("package:dplyr", unload=TRUE)
+  
    print("features part done")
   
   # ------------------------------------------------------------
