@@ -244,7 +244,7 @@ for (k in 1:length(city)) {
   
   #saveRDS(df1, paste0(outF, "/", city[k],"/","misc", "/","df1"))
   
-  
+   print("features part done")
   
   # ------------------------------------------------------------
   # Query individual layers in PG OSM database to create rasters
@@ -275,13 +275,15 @@ for (k in 1:length(city)) {
    ", city[k],"_env", " t2
   ON st_intersects(t1.geom,t2.geom)) t3;")
       
-      vectorEnv <- terra::vect(st_read(con_pg, query=queryEnv))
+      vectorEnv <- terra::vect(sf::st_read(con_pg, query=queryEnv))
       
       raster1 <- terra::rast(vectorEnv, resolution=30, crs=crs(vectorEnv))
+	  
+	  print(paste("layers", nlyr(raster1)))
       
       #queryUrFts <- paste0("SELECT * FROM ", city[i],"_ur_fts", ";" )
       
-      vectorUrFts <- try(vect(st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
+      vectorUrFts <- try(terra::vect(sf::st_read(con_pg, query=queryUrFts)) ) # when vector has no rows then Warning: 1: [SpatVector from sf] empty SpatVector
       
       if(class(vectorUrFts) == "try-error") { vectorUrFts <- c() }
       
