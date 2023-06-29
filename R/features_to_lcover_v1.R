@@ -240,6 +240,7 @@ for (k in 1:length(city)) {
   
    print("features part done")
   
+   
   # ------------------------------------------------------------
   # Query individual layers in PG OSM database to create rasters
   
