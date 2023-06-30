@@ -69,7 +69,7 @@ priority_table <- read.csv('./misc/priority_table_v2.csv')
 cec <- read.csv('./misc/cec_north_america.csv')
 cop <- read.csv('./misc/copernicus_reclassification_table.csv') 
 
-city <- read.csv("./misc/mcsc_city_list1.csv")
+#city <- read.csv("./misc/mcsc_city_list1.csv")
 
 #=================================
 # Connect to PG db - STEP 2
