@@ -111,8 +111,8 @@ con_pg <- DBI::dbConnect(
 #=========================================================
 
 #select which cities to run
-#city <- c('Peterborough')
-city <- c('Toronto','Syracuse')
+city <- c('Peterborough')
+#city <- c('Toronto','Syracuse')
 
 # New city 
 #city <- city[!is.na(city$osm_id),]
