@@ -336,7 +336,7 @@ for (k in 1:length(city)) {
         
       {
         rasterRes1 <- terra::rasterize(vectorUrFts, raster1, field="class", background=NA, touches=FALSE,
-                                update=FALSE, sum=FALSE, cover=FALSE, overwrite=FALSE)
+                                update=FALSE, cover=FALSE, overwrite=FALSE)
         
         dir.create(paste0(outF,"lcrasters"))
         dir.create(paste0(outF,"lcrasters/",city[k]))
