@@ -161,7 +161,7 @@ for (k in 1:length(city)) {
 #    sqlList1[p] <- paste0("SELECT t1.feature, CASE WHEN t1.type is null then 'NULL' else t1.type END AS type, t1.material, t1.size::numeric,", "'", pg_views1[p],"'", " AS view FROM ", pg_views1[p], " t1 JOIN ",
  #                         city[k],"_env", " t2 ON st_intersects(t1.geom,t2.geom)")
     
-    sqlList1[p] <- paste0("SELECT t1.feature, CASE WHEN t1.type is null then 'NULL' else t1.type END AS type, t1.material, t1.size::numeric, t1.geom ", "'", pg_views1[p],"'", " AS view FROM ", pg_views1[p], " t1 ")
+    sqlList1[p] <- paste0("SELECT t1.feature, CASE WHEN t1.type is null then 'NULL' else t1.type END AS type, t1.material, t1.size::numeric, t1.geom, ", "'", pg_views1[p],"'", " AS view FROM ", pg_views1[p], " t1 ")
     
   }
   
