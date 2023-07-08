@@ -172,7 +172,7 @@ for (k in 1:length(city)) {
   #  "SELECT DISTINCT feature, type, material, size, view, row_number() OVER (ORDER BY view, feature) AS rid FROM (", sqlUnion1, ") t1;") )
   
   df <- dbGetQuery(con_pg, paste0(
-    "SELECT DISTINCT feature, type, material, size, view FROM (", sqlUnion1, ") t1 JOIN ",
+    "SELECT DISTINCT t1.feature, t1.type, t1.material, t1.size, t1.view FROM (", sqlUnion1, ") t1 JOIN ",
     city[k],"_env", " t2 ON st_intersects(t1.geom,t2.geom)") )
   
   
