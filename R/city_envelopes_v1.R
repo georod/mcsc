@@ -31,7 +31,7 @@ library(terra)
 # github project folder on server
 setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 # project folder on desktop
-#setwd("~/github/mcsc/")
+#setwd("C:/Users/Peter R/github/mcsc/")
 
 # project output folder
 outF <- "projects/def-mfortin/georod/data/mcsc-proj/"
@@ -47,8 +47,8 @@ city <- read.csv("./misc/mcsc_city_list1.csv")
 #   drv = RPostgres::Postgres(),
 #   host = "localhost",
 #   port = 5432,
-#   #dbname = "osm",
-#   dbname = "georod_db_osm",
+#   dbname = "osm",
+#   #dbname = "georod_db_osm",
 #   user = Sys.getenv("username"),
 #   password = Sys.getenv("pwd")
 # )
@@ -73,7 +73,8 @@ con_pg <- DBI::dbConnect(
 city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[!(city$pg_city %in% c('Toronto', 'Chicago', 'City_of_New_York', 'Fort_Collins')),]
-#city <- city[(city$pg_city %in% c('Mexico')),]
+#city <- city[(city$pg_city %in% c('Peterborough')),]
+#city <- city[(city$pg_city %in% c('Toronto')),]
 #print(city)
 
 # Loop for creating city spatial envelopes

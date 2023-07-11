@@ -76,7 +76,7 @@ cop <- read.csv('./misc/copernicus_reclassification_table.csv')
 # Perhaps it is best to run this code separately so that the lcover raster is only run once.
 
 #local test raster
-#r4 <- rast("C:/Users/Peter R/Documents/data/ont_Red.tif")
+#r4 <- terra::rast("C:/Users/Peter R/Documents/data/gis/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
 r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
 
 cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
@@ -91,7 +91,7 @@ resTab <- read.csv("./misc/resistance_table.csv")
 ###reclassification table for CEC
 pri <- priority_table %>% dplyr::select(feature, priority)
 colnames(pri)<- c('mcsc', 'mcsc_value')
-cec <- read.csv('cec_north_america.csv')
+#cec <- read.csv('cec_north_america.csv')
 rec_cec <- left_join(cec, pri, by='mcsc')
 rec_cec_final <- rec_cec %>% mutate(mcsc_value = ifelse(mcsc == 'developed_na', 28, mcsc_value))
 #write.csv(rec_cec_final, 'reclass_cec_2_mcsc.csv')
@@ -133,37 +133,38 @@ resTab$source_strength <- resTab$source_strength
 for (k in 1:length(city)) {
   
   queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
-  vectorEnv <- vect(st_read(con_pg, query=queryEnv))
+  vectorEnv <- terra::vect(sf::st_read(con_pg, query=queryEnv))
   
 # Get extent of city envelope
-ext1 <- buffer(vectorEnv, width=500)
+ext1 <- terra::buffer(vectorEnv, width=500)
 # Get crs of N. America raster
-newcrs <- crs(r4, proj=TRUE)
+newcrs <- terra::crs(r4, proj=TRUE)
 # Project to North America raster projection
 ext1Pj <- terra::project(ext1, newcrs)
 # Crop NA land cover to city envelope extent
-r5 <- crop(r4, ext1Pj)
+r5 <- terra::crop(r4, ext1Pj)
 
-r3 <- rast(paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'))
+r3 <- terra::rast(paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'))
 
 # transform cropped raster crs to EPSG 3857 , "EPSG:3857"
-r6 <- project(r5, r3, method="near", align=TRUE)
+r6 <- terra::project(r5, r3, method="near", align=TRUE)
 # crop to ensure rasters have the same extent
-r6 <- crop(r6, r3)
+r6 <- terra::crop(r6, r3)
+terra::writeRaster(r6, paste0(outF,"lcrasters/",city[k],"/output/",'cec_lcover.tif'), overwrite=TRUE)
 #plot(r6, type="classes")
 # Mask raster
-r7 <- mask(r6, r3, inverse=TRUE, maskvalue=NA)
+r7 <- terra::mask(r6, r3, inverse=TRUE, maskvalue=NA)
 
-rclM <- as.matrix(cecRes[,c(3,7)])
+rclM <- as.matrix(cecRes[,c(2,4)])
 #rclM <- matrix(rclM, ncol=2, byrow=TRUE)
-r8 <- classify(r7, rclM)
+r8 <- terra::classify(r7, rclM)
 #plot(r8, type="classes")
 
 
-r9 <- cover(r3, r8)
-r9 <- subst(r9, 0, 100)
+r9 <- terra::cover(r3, r8)
+#r9 <- subst(r9, 0, 100)
 #plot(r9, type="classes")
-writeRaster(r9, paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif'), overwrite=TRUE)
+terra::writeRaster(r9, paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif'), overwrite=TRUE)
 
 
 
@@ -193,3 +194,38 @@ time.taken
 
 # disconnect from db
 #dbDisconnect(con_pg)
+
+
+#========================
+# Sample for validation
+#========================
+
+sam1 <- sample(10, terra::as.points(rasterRes1, values=TRUE, na.rm=TRUE, na.all=FALSE), replace=FALSE)
+
+sam1 <- terra::spatSample(r3, 10, method="stratified", replace=FALSE, na.rm=FALSE, 
+                          as.raster=FALSE, as.df=TRUE, as.points=TRUE, values=TRUE, cells=TRUE, 
+                          xy=TRUE, ext=NULL, warn=TRUE, weights=NULL, exp=5)
+
+names(sam1) <- c("cell", "x", "y", "value")
+
+terra::plot(sam1,"value", type="classes")
+
+#terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1", ".shp"), filetype="ESRI Shapefile", layer=NULL, insert=FALSE,
+#           overwrite=TRUE, options="ENCODING=UTF-8")
+
+terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1", ".geojson"), filetype="GeoJson", layer=NULL, insert=FALSE,
+                   overwrite=TRUE, options="ENCODING=UTF-8")
+
+sam1Df <- as.data.frame(sam1[,c(1,4)])
+dim(sam1Df)
+
+featureLabs <- (unique(largeMam[largeMam$view!='water', c(3,4)])) # You need to get rid of water or waterways otherwise you get duplicates
+
+sam1Df2 <- sqldf("SELECT t1.*, t2.view FROM sam1Df t1 JOIN featureLabs t2 ON t1.value=t2.priority")
+dim(sam1Df2)
+head(sam1Df2)
+sam1Df2$rowid <- 1:nrow(sam1Df2)
+
+#write.csv(sam1Df2[order(sam1Df2$cell), c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
+write.csv(sam1Df2[,c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
+

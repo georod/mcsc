@@ -457,9 +457,9 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	NULL AS size,
 	10 AS pri, 
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE tags->>'natural'IN('mud', 'dune',
+    FROM polygons WHERE tags->>'natural' IN ('mud', 'dune',
 	'sand','scree','sinkhole', 'beach') or  -- these are bare non-concrete that can be called later from the material column
-	tags->> 'landuse'IN('brownfield', 'construction') or -- these are bare non-concrete that can be called later from the feature column
+	tags->> 'landuse' IN ('brownfield', 'construction') or -- these are bare non-concrete that can be called later from the feature column
 	tags->> 'golf' IN ('bunker') or -- bunker is bare non-concrete that can be called later from the size column
 	tags->> 'waterway' = 'boatyard' -- bare land for boats
 	;
@@ -473,7 +473,7 @@ SELECT (row_number() OVER ())::int AS sid, area_id::varchar(20),
 	NULL AS size,
 	11 AS pri,
 	st_multi(geom)::geometry('MultiPolygon', 3857)  AS geom
-    FROM polygons WHERE tags->>'landuse'IN('forest') or 
+    FROM polygons WHERE tags->>'landuse' IN ('forest') or 
 	tags->>'natural'='wood' or 
 	tags ->> 'boundary' IN ('forest', 'forest_compartment') --national_park, 'protected_area
 	;
