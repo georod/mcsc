@@ -136,7 +136,7 @@ for (k in 1:length(city)) {
   
   #pg_union_views0 <- paste(readLines("./sql/features_union_string.txt"), collapse="\n")
   #pg_union_views0 <- source("./R/features_union_string.R")
-  source("./R/features_union_string.R")
+  source("./R/features_union_string.r")
     
   
   dfSf <- terra::vect(sf::st_read(con_pg, query=pg_union_views0))
