@@ -86,6 +86,29 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 city <- city[(city$pg_city %in% c('Toronto')), 6]
 #city <- city[ ,6]
 
+#=================================
+# Connect to PG db - STEP 2
+#=================================
+# add username and pwd to .Renviron
+# PR's local database
+# con_pg <- DBI::dbConnect(
+# drv = RPostgres::Postgres(),
+# host = "localhost",
+# port = 5432,
+# dbname = "osm",
+# user = Sys.getenv("username"),
+# password = Sys.getenv("pwd")
+# )
+
+
+# Remote server. Thsi assumes this R script is running within the server
+con_pg <- DBI::dbConnect(
+  drv = RPostgres::Postgres(),
+  host = "cedar-pgsql-vm",
+  port = 5432,
+  dbname = "georod_db_osm"
+)
+
 
 #-------------------------------
 # Modify CSVs
@@ -189,7 +212,9 @@ time.taken <- end.time - start.time
 time.taken
 
 # disconnect from db
-#dbDisconnect(con_pg)
+dbDisconnect(con_pg)
+
+print("done creating rasters")
 
 
 
