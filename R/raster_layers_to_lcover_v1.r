@@ -200,13 +200,13 @@ time.taken
 # Sample for validation
 #========================
 
-sam2 <- sample(10, terra::as.points(terra::rast(paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif')), values=TRUE, na.rm=TRUE, na.all=FALSE), replace=FALSE)
+sam0 <- terra::rast(paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif'))
 
-sam1 <- terra::spatSample(r3, 10, method="stratified", replace=FALSE, na.rm=FALSE, 
+sam1 <- terra::spatSample(sam0, 10, method="stratified", replace=FALSE, na.rm=FALSE, 
                           as.raster=FALSE, as.df=TRUE, as.points=TRUE, values=TRUE, cells=TRUE, 
-                          xy=TRUE, ext=NULL, warn=TRUE, weights=NULL, exp=5)
+                          xy=FALSE, ext=NULL, warn=TRUE, weights=NULL, exp=5)
 
-names(sam1) <- c("cell", "x", "y", "value")
+names(sam1) <- c("cell", "value")
 
 terra::plot(sam1,"value", type="classes")
 
