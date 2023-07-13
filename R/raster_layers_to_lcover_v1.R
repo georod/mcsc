@@ -73,7 +73,9 @@ cop <- read.csv('./misc/copernicus_reclassification_table.csv')
 #local test raster, Ontario only
 #r4 <- terra::rast("C:/Users/Peter R/Documents/data/gis/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
 # Compete raster for North America
-r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
+#r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
+# This is the new version of CEC
+r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_landcover_2015v2_30m/data/NA_NALCMS_landcover_2015v2_30m.tif")
 
 cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 
