@@ -77,7 +77,7 @@ cop <- read.csv('./misc/copernicus_reclassification_table.csv')
 # This is the new version of CEC
 r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_landcover_2015v2_30m/data/NA_NALCMS_landcover_2015v2_30m.tif")
 
-cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
+#cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 
 #priority_table <- read.csv("./misc/resistance_table.csv")
 

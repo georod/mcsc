@@ -225,7 +225,9 @@ for (k in 1:length(city)) {
     
     for (j in 1:nrow(vals)) {
       
-      sqlPrimer <- sqldf::sqldf(paste0("SELECT distinct feature, type, priority, view FROM df2 WHERE view='", featUrb[i],"' AND priority=", vals$priority[j], " ;"))
+      #sqlPrimer <- sqldf::sqldf(paste0("SELECT distinct feature, type, priority, view FROM df2 WHERE view='", featUrb[i],"' AND priority=", vals$priority[j], " ;"))
+      
+      sqlPrimer <- sqldf::sqldf(paste0("SELECT distinct feature, CASE WHEN type is null then 'NULL' ELSE type END AS type, priority, view FROM df2 WHERE view='", featUrb[i],"' AND priority=", vals$priority[j], " ;"))
       
       
       dfSf$type <- ifelse(is.na(dfSf$type), 'NULL', dfSf$type)
