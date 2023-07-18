@@ -111,7 +111,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city$pg_city[-c(20,23,24)] # Removing Peterborough, Toronto, & Syracuse
 
-city <- city$pg_city[,c(1:4)] # Skip Freiburg
+city <- city[c(1:4),] # Skip Freiburg
 # city <- city$pg_city[,c(6:10)]
 # city <- city$pg_city[,c(11:15)]
 # city <- city$pg_city[,c(16:20)]
