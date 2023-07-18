@@ -112,9 +112,9 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city$pg_city[-c(20,23,24)] # Removing Peterborough, Toronto, & Syracuse
 
 #city <- city[c(1:4),] # Skip Freiburg
-city <- city[c(6:10),6]
-# city <- city[c(11:15),]
-# city <- city[c(16:20),]
+#city <- city[c(6:10),6]
+city <- city[c(11:22),]
+# city <- city[c(24:34),] # Skip Toronto, already done
 
 
 pg_views1 <- unique(view_table$view)
