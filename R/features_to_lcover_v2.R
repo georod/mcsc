@@ -111,10 +111,10 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city$pg_city[-c(20,23,24)] # Removing Peterborough, Toronto, & Syracuse
 
-city <- city[c(1:4),] # Skip Freiburg
-# city <- city$pg_city[,c(6:10)]
-# city <- city$pg_city[,c(11:15)]
-# city <- city$pg_city[,c(16:20)]
+#city <- city[c(1:4),] # Skip Freiburg
+city <- city[c(6:10),6]
+# city <- city[c(11:15),]
+# city <- city[c(16:20),]
 
 
 pg_views1 <- unique(view_table$view)
@@ -135,7 +135,7 @@ for (k in 1:length(city)) {
   #-----------------------------------
   
   
-  city0 <- paste0(city[k,6],"_env")
+  city0 <- paste0(city[k],"_env")
   
   # Run features_union_string to get object pg_union_views0
   
@@ -241,7 +241,7 @@ for (k in 1:length(city)) {
       vectorUrFts <- dfSf[which(dfSf$view==sqlPrimer$view[1] & dfSf$type %in% sqlPrimer$type),]
       vectorUrFts$class <- sqlPrimer$priority[1]
       
-      queryEnv <- paste0("SELECT * FROM ",city[k,6],"_env", ";")
+      queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
       vectorEnv <- terra::vect(sf::st_read(con_pg, query=queryEnv))
       
       raster1 <- terra::rast(vectorEnv, resolution=30, crs="EPSG:3857")
@@ -257,9 +257,9 @@ for (k in 1:length(city)) {
                                 update=FALSE, cover=FALSE, overwrite=FALSE)
         
         dir.create(paste0(outF,"lcrasters"))
-        dir.create(paste0(outF,"lcrasters/",city[k,6]))
+        dir.create(paste0(outF,"lcrasters/",city[k]))
         
-        terra::writeRaster(rasterRes1, paste0(outF,"lcrasters/",city[k,6],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$priority[1],".tif"), overwrite=TRUE)
+        terra::writeRaster(rasterRes1, paste0(outF,"lcrasters/",city[k],"/",sqlPrimer$view[1],"__",sqlPrimer$priority[1],"__",sqlPrimer$priority[1],".tif"), overwrite=TRUE)
         
       }
       
@@ -290,7 +290,7 @@ time.taken
 for (k in 1:length(city)) {
   # Read raster based on priority flag first, then stack, and collapse
   
-  rasterFiles <- list.files(paste0(outF,"lcrasters/",city[k,6]), pattern='.tif$', full.names = TRUE)
+  rasterFiles <- list.files(paste0(outF,"lcrasters/",city[k]), pattern='.tif$', full.names = TRUE)
   
   resVals <- sapply(strsplit(rasterFiles, "__"), "[", 3)
   resVals <- gsub(".tif", "", resVals)
@@ -309,8 +309,8 @@ for (k in 1:length(city)) {
   r3 <- terra::app(r1, fun='first', na.rm=TRUE)
   
   
-  dir.create(paste0(outF,"lcrasters/",city[k,6],"/output"))
-  terra::writeRaster(r3, paste0(outF,"lcrasters/",city[k,6],"/output/",'osm_lcover.tif'), overwrite=TRUE)
+  dir.create(paste0(outF,"lcrasters/",city[k],"/output"))
+  terra::writeRaster(r3, paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'), overwrite=TRUE)
   
 }
 

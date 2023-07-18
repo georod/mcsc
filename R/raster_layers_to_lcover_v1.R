@@ -86,8 +86,8 @@ city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city[(city$pg_city %in% c('Peterborough')),6]
-city <- city[(city$pg_city %in% c('Toronto')), 6]
-#city <- city[ ,6]
+#city <- city[(city$pg_city %in% c('Toronto')), 6]
+city <- city[1:4 ,6]
 
 #=================================
 # Connect to PG db - STEP 2
