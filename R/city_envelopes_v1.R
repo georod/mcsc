@@ -47,7 +47,7 @@ city <- read.csv("./misc/mcsc_city_list1.csv")
 #   drv = RPostgres::Postgres(),
 #   host = "localhost",
 #   port = 5432,
-#   dbname = "osm",
+#   dbname = "osm_ont",
 #   #dbname = "georod_db_osm",
 #   user = Sys.getenv("username"),
 #   password = Sys.getenv("pwd")
@@ -75,6 +75,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[!(city$pg_city %in% c('Toronto', 'Chicago', 'City_of_New_York', 'Fort_Collins')),]
 #city <- city[(city$pg_city %in% c('Peterborough')),]
 #city <- city[(city$pg_city %in% c('Toronto')),]
+#city <- city[(city$pg_city %in% c('Toronto', 'Peterborough')),]
 #print(city)
 
 # Loop for creating city spatial envelopes

@@ -37,7 +37,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("C:/Users/tizge/Documents/StructuralconnectivityDB/")
 
 # project output folder
-#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test2/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/"
 #project output on server
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
 
@@ -76,6 +76,7 @@ cop <- read.csv('./misc/copernicus_reclassification_table.csv')
 #r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_2015_LC_30m_LAEA_mmu5pix_.tif")
 # This is the new version of CEC
 r4 <- rast("~/projects/def-mfortin/georod/data/cec/NA_NALCMS_landcover_2015v2_30m/data/NA_NALCMS_landcover_2015v2_30m.tif")
+#r4 <- rast("C:/Users/Peter R/Documents/data/gis/cec/Land_cover_2015v2_30m_TIF/NA_NALCMS_landcover_2015v2_30m/data/NA_NALCMS_landcover_2015v2_30m.tif")
 
 #cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 
@@ -121,9 +122,10 @@ pri <- priority_table %>% dplyr::select(feature, priority)
 colnames(pri)<- c('mcsc', 'mcsc_value')
 #cec <- read.csv('cec_north_america.csv')
 rec_cec <- left_join(cec, pri, by='mcsc')
-rec_cec_final <- rec_cec %>% mutate(mcsc_value = ifelse(mcsc == 'developed_na', 28, mcsc_value))
+rec_cec_final <- rec_cec %>% mutate(mcsc_value = ifelse(mcsc == 'developed_na', 28, mcsc_value)) # This is not really needed as pri obj already has 28
 #write.csv(rec_cec_final, 'reclass_cec_2_mcsc.csv')
 #rec_cec_final <- read.csv('reclass_cec_2_mcsc.csv')
+cecRes <- rec_cec_final
 
 ###reclassification table for copernicus
 #cop <- read.csv('copernicus_reclassification_table.csv') %>% dplyr::select (copernicus, value, mcsc)
@@ -138,7 +140,7 @@ rec_cop <- left_join(rec_cop, pri, by='mcsc')
 rec_cop_final <- rec_cop %>% mutate(mcsc_value= ifelse(mcsc == 'developed_na', 28, mcsc_value))
 # write.csv(rec_cop_final, 'reclass_copernicus_2_mcsc.csv')
 # rec_cop_final <- read.csv('reclass_copernicus_2_mcsc.csv')
-cecRes <- rec_cec_final
+#cecRes <- rec_cec_final
 #cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
 
 
@@ -148,6 +150,7 @@ cecRes <- rec_cec_final
 #ext1 <- ext(r3)
 #ext1 <- as.polygons(ext(r3))
 #crs(ext1) <- "EPSG:3857"
+
 
 for (k in 1:length(city)) {
   
@@ -204,10 +207,8 @@ rclMsourceStr <- as.matrix(priority_table[,c("priority", "source_strength")])
 r12 <- terra::classify(r9, rclMsourceStr)
 terra::writeRaster(r12, paste0(outF,"lcrasters/",city[k],"/output/",'source_strength.tif'), overwrite=TRUE)
 
-
-
-
 }
+
 
 end.time <- Sys.time()
 time.taken <- end.time - start.time

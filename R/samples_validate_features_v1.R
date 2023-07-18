@@ -39,6 +39,7 @@ setwd("C:/Users/Peter R/github/mcsc")
 
 # project output folder
 outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/"
+outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/lcrasters/Toronto/"
 #project output on server
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/mammals/"
 
@@ -52,7 +53,7 @@ outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/"
 #================================
 
 # table with the priority, resistance and source strength
-priority_table <- read.csv('./misc/priority_table_v2.csv')
+#priority_table <- read.csv('./misc/priority_table_v2.csv')
 
 
 #========================
@@ -74,7 +75,7 @@ for (k in 1:length(city)) {
   #terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1", ".shp"), filetype="ESRI Shapefile", layer=NULL, insert=FALSE,
   #           overwrite=TRUE, options="ENCODING=UTF-8")
   
-  terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample2", ".geojson"), filetype="GeoJson", layer=NULL, insert=FALSE,
+  terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1", ".geojson"), filetype="GeoJson", layer=NULL, insert=FALSE,
                      overwrite=TRUE, options="ENCODING=UTF-8")
   
   sam1Df <- as.data.frame(sam1[,c(1,2)])
@@ -90,6 +91,7 @@ for (k in 1:length(city)) {
   sam1Df2$rowid <- 1:nrow(sam1Df2)
   
   #write.csv(sam1Df2[order(sam1Df2$cell), c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
-  write.csv(sam1Df2[,c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample2_df", ".csv") , row.names = FALSE)
+  write.csv(sam1Df2[,c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
   
 }
+

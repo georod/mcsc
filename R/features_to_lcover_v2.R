@@ -40,7 +40,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("C:/Users/tizge/Documents/StructuralconnectivityDB/")
 
 # project output folder
-#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test5/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/"
 #project output on server
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
 
@@ -72,7 +72,7 @@ city <- read.csv("./misc/mcsc_city_list1.csv")
 # drv = RPostgres::Postgres(),
 # host = "localhost",
 # port = 5432,
-# dbname = "osm",
+# dbname = "osm_ont",
 # user = Sys.getenv("username"),
 # password = Sys.getenv("pwd")
 # )
@@ -107,9 +107,14 @@ city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city[(city$pg_city %in% c('Peterborough')),6]
-city <- city[(city$pg_city %in% c('Toronto')), 6]
+#city <- city[(city$pg_city %in% c('Toronto')), 6]
 
 #city <- city$pg_city[-c(20,23,24)] # Removing Peterborough, Toronto, & Syracuse
+
+city <- city$pg_city[,c(1:4)] # Skip Freiburg
+# city <- city$pg_city[,c(6:10)]
+# city <- city$pg_city[,c(11:15)]
+# city <- city$pg_city[,c(16:20)]
 
 
 pg_views1 <- unique(view_table$view)
@@ -137,6 +142,7 @@ for (k in 1:length(city)) {
   #pg_union_views0 <- paste(readLines("./sql/features_union_string.txt"), collapse="\n")
   #pg_union_views0 <- source("./R/features_union_string.R")
   source("./R/features_union_string.r")
+  #source("./R/features_union_string_parking.r")
     
   
   dfSf <- terra::vect(sf::st_read(con_pg, query=pg_union_views0))
