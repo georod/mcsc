@@ -113,7 +113,9 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city[c(1:4), 6] # Skip Freiburg
 #city <- city[c(6:10),6]
-city <- city[c(11:22),6]
+#city <- city[c(11:13),6] # I ran out of memory and code stopped at National_Capital_Area
+city <- city[c(14),6]
+#city <- city[c(15:22),6]
 # city <- city[c(24:34),6] # Skip Toronto, already done
 
 
