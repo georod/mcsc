@@ -114,9 +114,12 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(1:4), 6] # Skip Freiburg
 #city <- city[c(6:10),6]
 #city <- city[c(11:13),6] # I ran out of memory and code stopped at National_Capital_Area
-city <- city[c(14),6]
-#city <- city[c(15:22),6]
-# city <- city[c(24:34),6] # Skip Toronto, already done
+#city <- city[c(14),6] # National Capital won't run. Skipped for now
+city <- city[c(15:19),6]
+#city <- city[c(20:22, 25 ),6] # Skip Toronto & Peterborough, already done
+# city <- city[c(26:29),6] 
+#city <- city[c(30),6] # San Diego is big too. Run alone
+#city <- city[c(31:34),6]
 
 
 pg_views1 <- unique(view_table$view)
