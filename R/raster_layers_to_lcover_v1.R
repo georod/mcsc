@@ -89,6 +89,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[(city$pg_city %in% c('Toronto')), 6]
 #city <- city[1:4 ,6]
 city <- city[6:10 ,6]
+city <- city[11:25 ,6]
 
 #=================================
 # Connect to PG db - STEP 2
@@ -180,7 +181,8 @@ r7 <- terra::mask(r6, r3, inverse=TRUE, maskvalue=NA)
 
 rclM <- as.matrix(cecRes[,c(2,4)])
 #rclM <- matrix(rclM, ncol=2, byrow=TRUE)
-r8 <- terra::classify(r7, rclM)
+r8 <- terra::classify(r7, rclM) # Save this?
+terra::writeRaster(r8, paste0(outF,"lcrasters/",city[k],"/output/",'cec2_lcover.tif'), overwrite=TRUE)
 #plot(r8, type="classes")
 
 

@@ -8,8 +8,8 @@
 
 #  Main aim: Get samples to validate OSM features. This code should be run locally (not server necessarily)
 
-start.time <- Sys.time()
-start.time
+#start.time <- Sys.time()
+#start.time
 
 #===================
 # Libraries
@@ -38,8 +38,11 @@ setwd("C:/Users/Peter R/github/mcsc")
 #setwd("C:/Users/tizge/Documents/StructuralconnectivityDB/")
 
 # project output folder
-outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/"
-outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/lcrasters/Toronto/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/lcrasters/Toronto/"
+inF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/mammals/"
+outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/mammals/sample_pts/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/osm_validation/mammals/"
 #project output on server
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/mammals/"
 
@@ -53,45 +56,70 @@ outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/lcrasters/To
 #================================
 
 # table with the priority, resistance and source strength
-#priority_table <- read.csv('./misc/priority_table_v2.csv')
+priority_table <- read.csv('./misc/priority_table_v2.csv')
+cec_table <- read.csv('./misc/cec_north_america_lcover_values.csv')
+
+
 
 
 #========================
 # Sample for validation
 #========================
 
+city <- city2[1:1,6] #[1] "Wilmington"  "Edmonton"    "Phoenix"     "Little_Rock"
+
+
 for (k in 1:length(city)) {
   
-  sam0 <- terra::rast(paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif'))
+  sam0 <- terra::rast(paste0(inF,"lcrasters/",city[k],"/output/",'all_lcover.tif'))
   
-  sam1 <- terra::spatSample(sam0, 10, method="stratified", replace=FALSE, na.rm=FALSE, 
+  set.seed(42) # Added on 2023-07-23 (not Toronto or Peterborough runs done by Joaquin)
+  sam1 <- terra::spatSample(sam0, 10, method="stratified", replace=FALSE, na.rm=TRUE, 
                             as.raster=FALSE, as.df=TRUE, as.points=TRUE, values=TRUE, cells=TRUE, 
                             xy=FALSE, ext=NULL, warn=TRUE, weights=NULL, exp=5)
   
-  names(sam1) <- c("cell", "value")
+  sam1$rowid <- 1:nrow(sam1)
+  names(sam1) <- c("cell", "value", "rowid")
+  
+# get x, y coordinates
+  coords1 <- as.data.frame(crds(project(sam1, "EPSG:4326")))
+  coords1$rowid <- 1:nrow(coords1)
+  
+  #rCEC <- terra::rast(paste0(inF,"lcrasters/",city[k],"/output/",'cec2_lcover.tif'))
+  #lcDf <- extract(rCEC, sam1, bind=F)
   
   #terra::plot(sam1,"value", type="classes")
   
   #terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1", ".shp"), filetype="ESRI Shapefile", layer=NULL, insert=FALSE,
   #           overwrite=TRUE, options="ENCODING=UTF-8")
   
-  terra::writeVector(sam1, paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1", ".geojson"), filetype="GeoJson", layer=NULL, insert=FALSE,
-                     overwrite=TRUE, options="ENCODING=UTF-8")
   
-  sam1Df <- as.data.frame(sam1[,c(1,2)])
   #dim(sam1Df)
   
   featureLabs <- unique(priority_table[,c(2,3)])
   
   featureLabs <- (unique(featureLabs[featureLabs$feature!='waterways', ])) # You need to get rid of water or waterways otherwise you get duplicates
+  featureLabs[nrow(featureLabs) + 1,] <- c(0, "null_water_skip")
   
-  sam1Df2 <- sqldf("SELECT t1.*, t2.feature FROM sam1Df t1 JOIN featureLabs t2 ON t1.value=t2.priority")
-  #dim(sam1Df2)
+  dir.create(paste0(outF,city[k]))
+  
+  sam1 <- merge(sam1, featureLabs, all.x=TRUE, by.x=c('value'), by.y=c('priority'))
+  
+  terra::writeVector(sam1, paste0(outF,city[k],"/", city[k], "_sample1", ".geojson"), filetype="GeoJson", layer=NULL, insert=FALSE,
+                     overwrite=TRUE, options="ENCODING=UTF-8")
+  
+  sam1Df <- as.data.frame(sam1[,c(1,2,3,4)])
+  
+  sam1Df2 <- sqldf("SELECT t1.rowid, t1.cell, t3.y, t3.x, t1.value, t1.feature FROM sam1Df t1 JOIN coords1 t3 ON t1.rowid=t3.rowid")
+  print(dim(sam1Df2))
   #head(sam1Df2)
-  sam1Df2$rowid <- 1:nrow(sam1Df2)
+  #sam1Df2$rowid <- 1:nrow(sam1Df2)
+  
   
   #write.csv(sam1Df2[order(sam1Df2$cell), c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
-  write.csv(sam1Df2[,c(4,1:3)], paste0(outF,"lcrasters/",city[k],"/output/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
+  write.csv(sam1Df2, paste0(outF, city[k],"/", city[k], "_sample1_df", ".csv") , row.names = FALSE)
+  
+
   
 }
 
