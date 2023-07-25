@@ -76,6 +76,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[(city$pg_city %in% c('Peterborough')),]
 #city <- city[(city$pg_city %in% c('Toronto')),]
 #city <- city[(city$pg_city %in% c('Toronto', 'Peterborough')),]
+city <- city[(city$pg_city %in% c('Victoria')),]
 #print(city)
 
 # Loop for creating city spatial envelopes
