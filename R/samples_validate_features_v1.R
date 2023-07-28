@@ -58,7 +58,7 @@ outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/mammals/sample_pts/"
 # table with the priority, resistance and source strength
 priority_table <- read.csv('./misc/priority_table_v2.csv')
 cec_table <- read.csv('./misc/cec_north_america_lcover_values.csv')
-
+city <- read.csv("./misc/mcsc_city_list1.csv")
 
 
 
@@ -66,7 +66,10 @@ cec_table <- read.csv('./misc/cec_north_america_lcover_values.csv')
 # Sample for validation
 #========================
 
-city <- city2[1:1,6] #[1] "Wilmington"  "Edmonton"    "Phoenix"     "Little_Rock"
+city <- city[!is.na(city$osm_id),]
+city$pg_city <- gsub(" ", "_", city$osm_city)
+#city <- city[1:4,6] #[1] "Wilmington"  "Edmonton"    "Phoenix"     "Little_Rock"
+city <- city[6:10,6]#[1] "Vancouver"    "Berkeley"     "Pasadena"     "Pomona"       "Fort_Collins"
 
 
 for (k in 1:length(city)) {
