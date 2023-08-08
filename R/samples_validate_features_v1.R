@@ -23,6 +23,7 @@ library(terra)
 #install.packages("sqldf")
 library(sqldf)
 #library(dplyr)
+library(foreach)
 
 
 
@@ -125,4 +126,44 @@ for (k in 1:length(city)) {
 
   
 }
+
+
+#----------------------------------------------------------------------------
+# Add CEC land cover values to facilitate OSM validation
+#----------------------------------------------------------------------------
+
+# 2023-07-31
+
+dataf2 <- "C:/Users/Peter R/Documents/PhD/tiziana/osm_validation/joaquins_work/completed_cities/"
+
+fpath10 <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/mammals/sample_pts/"
+
+outF <- fpath10
+
+r4 <- rast("C:/Users/Peter R/Documents/data/gis/cec/Land_cover_2015v2_30m_TIF/NA_NALCMS_landcover_2015v2_30m/data/NA_NALCMS_landcover_2015v2_30m.tif")
+
+
+city <- c("Edmonton", "Little_Rock", "Phoenix", "Wilmington")
+
+
+pts1 <- list.files(fpath10, pattern=".geojson", recursive=T, full.names = T)
+pts1 <- pts1[c(2, 4, 6, 9)]
+
+
+extract1 <- foreach (i=1:length(pts1)) %do% {
+  
+  terra::extract(r4, project(vect(pts1[i]), r4), )
+  
+}
+
+# Write to csv
+for (i in 1:length(pts1))  {
+  
+  write.csv(extract1[[i]], paste0(outF, city[i],"/", city[i], "_sample1_df_cec", ".csv") , row.names = FALSE)
+  
+}
+
+
+
+
 

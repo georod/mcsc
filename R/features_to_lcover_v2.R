@@ -114,7 +114,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(1:4), 6] # Skip Freiburg, no Germany OSM on DRAC
 #city <- city[c(6:10),6]
 #city <- city[c(11:13),6] # I ran out of memory and code stopped at National_Capital_Area
-city <- city[c(14),6] # National Capital won't run. Skipped for now
+#city <- city[c(14),6] # I was able to run the National Capital using 120GB of RAM and 5 hours
 #city <- city[c(15:18),6]
 #city <- city[c(19),6] # New york needs more memory. I gave it 60GB & 3 hours. It completed successfully.
 #city <- city[c(20:22, 24, 25 ),6] # Skip Toronto, already done
@@ -122,7 +122,7 @@ city <- city[c(14),6] # National Capital won't run. Skipped for now
 #city <- city[c(30),6] # San Diego is big too. Run alone
 #city <- city[c(31),6] # Aromas does not exist in DRAC's OSM. Skipping for now
 #city <- city[c(32:34),6] #
-#city <- city[c(35:nrow(city)),6] # I can't do Victoria as I have no permission on public schema
+city <- city[c(35:nrow(city)),6] # Now I have permission on public schema and can run Victoria
 
 
 pg_views1 <- unique(view_table$view)
