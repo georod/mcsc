@@ -87,9 +87,9 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city[(city$pg_city %in% c('Peterborough')),6]
 #city <- city[(city$pg_city %in% c('Toronto')), 6]
-#city <- city[1:4 ,6]
+#city <- city[1:4 ,6] #Skip Freiburg
 #city <- city[6:10 ,6]
-city <- city[c(11:30,32:35) ,6] # cec2 added
+city <- city[c(1:4, 6:30,32:35) ,6] # cec2 added
 
 #=================================
 # Connect to PG db - STEP 2

@@ -113,9 +113,9 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 
 #city <- city[c(1:4), 6] # Skip Freiburg, no Germany OSM on DRAC
 #city <- city[c(6:10),6]
-#city <- city[c(11:13),6] # I ran out of memory and code stopped at National_Capital_Area
+#city <- city[c(11:13),6] # I ran out of memory and code stopped at National_Capital_Area.  Did complete, osm lyr not created.
 #city <- city[c(14),6] # I was able to run the National Capital using 120GB of RAM and 5 hours
-#city <- city[c(15:18),6]
+#city <- city[c(15:18),6] # did complete, osm lyr not created.
 #city <- city[c(19),6] # New york needs more memory. I gave it 60GB & 3 hours. It completed successfully.
 #city <- city[c(20:22, 24, 25 ),6] # Skip Toronto, already done
 #city <- city[c(26:29),6] 
