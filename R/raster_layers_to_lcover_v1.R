@@ -37,7 +37,7 @@ setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
 #setwd("C:/Users/tizge/Documents/StructuralconnectivityDB/")
 
 # project output folder
-#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/test6/peter_newcode/"
+#outF <- "C:/Users/Peter R/Documents/PhD/tiziana/mcsc_proj/mammals/"
 #project output on server
 #outF <- "~/projects/def-mfortin/georod/data/mcsc_proj/smallmam/"
 
@@ -89,7 +89,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[(city$pg_city %in% c('Toronto')), 6]
 #city <- city[1:4 ,6] #Skip Freiburg
 #city <- city[6:10 ,6]
-city <- city[c(1:4, 6:30,32:35) ,6] # cec2 added
+city <- city[c(1:4, 6:30,32:35) ,6] # #Skip Freiburg & Aromas
 
 #=================================
 # Connect to PG db - STEP 2
@@ -100,7 +100,7 @@ city <- city[c(1:4, 6:30,32:35) ,6] # cec2 added
 # drv = RPostgres::Postgres(),
 # host = "localhost",
 # port = 5432,
-# dbname = "osm",
+# dbname = "osm_ont",
 # user = Sys.getenv("username"),
 # password = Sys.getenv("pwd")
 # )
@@ -187,7 +187,7 @@ terra::writeRaster(r8, paste0(outF,"lcrasters/",city[k],"/output/",'cec2_lcover.
 
 
 r9 <- terra::cover(r3, r8)
-#r9 <- subst(r9, 0, 100)
+r9 <- subst(r9, 0, 12)
 #plot(r9, type="classes")
 terra::writeRaster(r9, paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover.tif'), overwrite=TRUE)
 
