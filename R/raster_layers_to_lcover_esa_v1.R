@@ -66,8 +66,9 @@ priority_table <- read.csv('./misc/priority_table_v2.csv')
 
 #resTab <- read.csv("./misc/priority_table_v2.csv")
 #tables with the classes included in the Global landcover and their equivalence to our OSM-derived landcover classes
-cec <- read.csv('./misc/cec_north_america.csv')
-cop <- read.csv('./misc/copernicus_reclassification_table.csv') 
+#cec <- read.csv('./misc/cec_north_america.csv')
+#cop <- read.csv('./misc/copernicus_reclassification_table.csv') 
+cec <- read.csv('./misc/esa.csv') # I will keep the name cec so that I do not mess up the code
 
 
 #=====================================
@@ -207,6 +208,8 @@ ext1Pj <- terra::project(ext1, newcrs)
 
 # Crop ESA land cover to city envelope extent
 r5 <- terra::crop(r4, ext1Pj)
+
+terra::writeRaster(r5, paste0(outF,"lcrasters/",city[k],"/output/",'esa.tif'), overwrite=TRUE)
 
 # Given that one is Geographic and the other planar, it is safer to project
 #fact1 <- round(dim(r5)[1:2] / dim(r3)[1:2]) # high resolution raster / low resolution raster. Proj does not need to be the same but should be equivalent extents
