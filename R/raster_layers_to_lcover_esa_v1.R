@@ -27,6 +27,7 @@ library(DBI)
 library(sf)
 library(terra)
 #install.packages("sqldf")
+library(foreach)
 library(sqldf)
 library(dplyr)
 
