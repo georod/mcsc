@@ -68,7 +68,7 @@ priority_table <- read.csv('./misc/priority_table_v2.csv')
 #tables with the classes included in the Global landcover and their equivalence to our OSM-derived landcover classes
 #cec <- read.csv('./misc/cec_north_america.csv')
 #cop <- read.csv('./misc/copernicus_reclassification_table.csv') 
-cec <- read.csv('./misc/esa.csv') # I will keep the name cec so that I do not mess up the code
+cec <- read.csv('./misc/esa.csv') # I will keep the name cec so to avoid changing the code below
 
 
 #=====================================
@@ -140,16 +140,16 @@ cecRes <- rec_cec_final
 
 ###reclassification table for copernicus
 #cop <- read.csv('copernicus_reclassification_table.csv') %>% dplyr::select (copernicus, value, mcsc)
-rec_cop <- left_join(cop, pri, by='mcsc')
-#rec_cop %>% filter(is.na(mcsc_value.y)) #PR: ask Tiziana if x or y. Is seems not to matter
-#rec_cop$mcsc[6]<-'linear_feature_na_traffic' 
-rec_cop$mcsc[7]<-'linear_feature_na_traffic' 
-rec_cop$mcsc[23]<-'linear_feature_vh_traffic'
-rec_cop$mcsc[9]<-'linear_feature_rail'   
-rec_cop <- rec_cop %>% dplyr::select(1,2,3)
-rec_cop <- left_join(rec_cop, pri, by='mcsc')
-rec_cop_final <- rec_cop %>% mutate(mcsc_value= ifelse(mcsc == 'developed_na', 28, mcsc_value))
-# write.csv(rec_cop_final, 'reclass_copernicus_2_mcsc.csv')
+# rec_cop <- left_join(cop, pri, by='mcsc')
+# #rec_cop %>% filter(is.na(mcsc_value.y)) #PR: ask Tiziana if x or y. Is seems not to matter
+# #rec_cop$mcsc[6]<-'linear_feature_na_traffic' 
+# rec_cop$mcsc[7]<-'linear_feature_na_traffic' 
+# rec_cop$mcsc[23]<-'linear_feature_vh_traffic'
+# rec_cop$mcsc[9]<-'linear_feature_rail'   
+# rec_cop <- rec_cop %>% dplyr::select(1,2,3)
+# rec_cop <- left_join(rec_cop, pri, by='mcsc')
+# rec_cop_final <- rec_cop %>% mutate(mcsc_value= ifelse(mcsc == 'developed_na', 28, mcsc_value))
+# # write.csv(rec_cop_final, 'reclass_copernicus_2_mcsc.csv')
 # rec_cop_final <- read.csv('reclass_copernicus_2_mcsc.csv')
 #cecRes <- rec_cec_final
 #cecRes <- read.csv("./misc/cec_north_america_resistance_values.csv")
