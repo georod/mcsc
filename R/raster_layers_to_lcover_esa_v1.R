@@ -197,11 +197,17 @@ rExtIndex <- rExtDf1[rExtDf1$intersects1==TRUE, 1]
 rFiles2 <- (rFiles1[rExtIndex])
 print("done subsetting rasters files")
 
+if (length(rFiles2)>1) {
 # Read rasters into a spatial collection
 #rL1 <- list(terra::rast(rFiles2))
 # Create a raster spatial collection
 rL1spc <- terra::sprc(rFiles2)
 print("done creating raster spatial collection")
+} else { 
+    rL1spc <- terra::rast(rFiles2)
+    print("done readingraster, no spatial collection")
+}
+
 # Merge/mosaic ESA rasters
 r4 <- terra::merge(rL1spc)
 print("done merging rasters")
