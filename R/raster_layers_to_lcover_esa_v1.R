@@ -133,7 +133,7 @@ con_pg <- DBI::dbConnect(
 pri <- priority_table %>% dplyr::select(feature, priority)
 colnames(pri)<- c('mcsc', 'mcsc_value')
 #cec <- read.csv('cec_north_america.csv')
-rec_cec <- left_join(cec, pri, by='mcsc')
+rec_cec <- dplyr::left_join(cec, pri, by='mcsc')
 rec_cec_final <- rec_cec %>% mutate(mcsc_value = ifelse(mcsc == 'developed_na', 28, mcsc_value)) # This is not really needed as pri obj already has 28
 #write.csv(rec_cec_final, 'reclass_cec_2_mcsc.csv')
 #rec_cec_final <- read.csv('reclass_cec_2_mcsc.csv')
@@ -175,7 +175,7 @@ r3 <- terra::rast(paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'))
 # Get city extent
 # Get extent of city envelope
 ext1 <- terra::buffer(vectorEnv, width=500)
-cityExt <- ext(project(ext1, "EPSG:4326")) # The project of ESA is EPSG:4326
+cityExt <- ext(terra::project(ext1, "EPSG:4326")) # The project of ESA is EPSG:4326
 
 # Read all ESA rasters (> 100 rasters)
 rFiles1 <- list.files(path="~/projects/def-mfortin/georod/data/esa", pattern="*.tif$", full.names = T, recursive = T) 
@@ -184,22 +184,22 @@ rFiles1 <- list.files(path="~/projects/def-mfortin/georod/data/esa", pattern="*.
 # Find which rasters overlap with city raster
 rExtL1 <- foreach (i=1:length(rFiles1)) %do% {
   
-  cbind.data.frame("rFile"=i, "intersects"=terra::relate(terra::ext(terra::rast(rFiles1[i])), cityExt, relation="intersects")) 
+  cbind.data.frame("rFile"=i, "intersects1"=terra::relate(terra::ext(terra::rast(rFiles1[i])), cityExt, relation="intersects")) 
   
 }
 
 rExtDf1 <- do.call("rbind", rExtL1)
-rExtIndex <- rExtDf1[rExtDf1$intersects==TRUE, 1]
+rExtIndex <- rExtDf1[rExtDf1$intersects1==TRUE, 1]
 
 # Subset ESA raster files lists for merging. This is to avoid merging hundreds of rasters
 rFiles2 <- (rFiles1[rExtIndex])
 
 # Read rasters into a list
-rL1 <- list(rast(rFiles2))
+rL1 <- list(terra::rast(rFiles2))
 # Create a raster spatial collection
-rL1spc <- sprc(rL1)
+rL1spc <- terra::sprc(rL1)
 # Merge/mosain ESA rasters
-r4 <- merge(rL1spc)
+r4 <- terra::merge(rL1spc)
 
 
 # Get crs of ESA raster
@@ -236,7 +236,7 @@ terra::writeRaster(r8, paste0(outF,"lcrasters/",city[k],"/output/",'esa2_lcover.
 
 
 r9 <- terra::cover(r3, r8)
-r9 <- subst(r9, 0, 12)
+r9 <- terra::subst(r9, 0, 12)
 #plot(r9, type="classes")
 terra::writeRaster(r9, paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover2.tif'), overwrite=TRUE)
 
