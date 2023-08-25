@@ -169,6 +169,8 @@ for (k in 1:length(city)) {
   queryEnv <- paste0("SELECT * FROM ",city[k],"_env", ";")
   vectorEnv <- terra::vect(sf::st_read(con_pg, query=queryEnv))
   
+  print(paste0("processing city: ", city[k]))
+  
 # Load city raster  
 r3 <- terra::rast(paste0(outF,"lcrasters/",city[k],"/output/",'osm_lcover.tif'))
 
@@ -193,14 +195,16 @@ rExtIndex <- rExtDf1[rExtDf1$intersects1==TRUE, 1]
 
 # Subset ESA raster files lists for merging. This is to avoid merging hundreds of rasters
 rFiles2 <- (rFiles1[rExtIndex])
+print("done subsetting rasters files")
 
 # Read rasters into a list
 rL1 <- list(terra::rast(rFiles2))
 # Create a raster spatial collection
 rL1spc <- terra::sprc(rL1)
-# Merge/mosain ESA rasters
+print("done creating raster spatial collection")
+# Merge/mosaic ESA rasters
 r4 <- terra::merge(rL1spc)
-
+print("done merging rasters")
 
 # Get crs of ESA raster
 newcrs <- terra::crs(r4, proj=TRUE)
@@ -209,6 +213,7 @@ ext1Pj <- terra::project(ext1, newcrs)
 
 # Crop ESA land cover to city envelope extent
 r5 <- terra::crop(r4, ext1Pj)
+print("done cropping rasters")
 
 terra::writeRaster(r5, paste0(outF,"lcrasters/",city[k],"/output/",'esa.tif'), overwrite=TRUE)
 
@@ -217,6 +222,7 @@ terra::writeRaster(r5, paste0(outF,"lcrasters/",city[k],"/output/",'esa.tif'), o
 fact1 <- round(dim(r5)[1:2] / dim(terra::project(r3, newcrs))[1:2])
 
 r5 <- terra::aggregate(r5, fact1, fun="modal", na.rm=T)
+print("done aggregating raster")
 
 # transform cropped raster crs to EPSG 3857 , "EPSG:3857"
 r6 <- terra::project(r5, r3, method="near", align=TRUE)
