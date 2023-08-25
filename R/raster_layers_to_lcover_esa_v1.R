@@ -94,7 +94,7 @@ cec <- read.csv('./misc/esa.csv') # I will keep the name cec so to avoid changin
 city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
 
-#city <- city[(city$pg_city %in% c('Victoria')), 6]
+#city <- city[(city$pg_city %in% c('Phoenix')), 6]
 #city <- city[(city$pg_city %in% c('Peterborough')),6]
 #city <- city[(city$pg_city %in% c('Toronto')), 6]
 #city <- city[1:4 ,6] #Skip Freiburg
@@ -197,10 +197,10 @@ rExtIndex <- rExtDf1[rExtDf1$intersects1==TRUE, 1]
 rFiles2 <- (rFiles1[rExtIndex])
 print("done subsetting rasters files")
 
-# Read rasters into a list
-rL1 <- list(terra::rast(rFiles2))
+# Read rasters into a spatial collection
+#rL1 <- list(terra::rast(rFiles2))
 # Create a raster spatial collection
-rL1spc <- terra::sprc(rL1)
+rL1spc <- terra::sprc(rFiles2)
 print("done creating raster spatial collection")
 # Merge/mosaic ESA rasters
 r4 <- terra::merge(rL1spc)
