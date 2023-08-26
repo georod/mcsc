@@ -197,20 +197,27 @@ rExtIndex <- rExtDf1[rExtDf1$intersects1==TRUE, 1]
 rFiles2 <- (rFiles1[rExtIndex])
 print("done subsetting rasters files")
 
-if (length(rFiles2)>1) {
-# Read rasters into a spatial collection
-#rL1 <- list(terra::rast(rFiles2))
-# Create a raster spatial collection
-rL1spc <- terra::sprc(rFiles2)
-print("done creating raster spatial collection")
-} else { 
-    rL1spc <- terra::rast(rFiles2)
-    print("done readingraster, no spatial collection")
-}
+
+# Note: the merge and mosaic functions were given this error: Error: std::bad_alloc
+# for this reason, I had to change the code to use vrt() instead
+# if (length(rFiles2)>1) {
+# # Read rasters into a spatial collection
+# #rL1 <- list(terra::rast(rFiles2))
+# # Create a raster spatial collection
+# rL1spc <- terra::sprc(rFiles2)
+# print("done creating raster spatial collection")
+# } else { 
+#     rL1spc <- terra::rast(rFiles2)
+#     print("done reading raster, no spatial collection")
+# }
 
 # Merge/mosaic ESA rasters
-r4 <- terra::merge(rL1spc)
-print("done merging rasters")
+# for this reason I used vrt (virtual raster) function
+#r4 <- terra::merge(rL1spc)
+#print("done merging rasters")
+
+# create virtual raster instead of using merge/mosaic. vrt in a way does a merge.
+r4  <- vrt(rFiles2)
 
 # Get crs of ESA raster
 newcrs <- terra::crs(r4, proj=TRUE)
@@ -222,6 +229,7 @@ r5 <- terra::crop(r4, ext1Pj)
 print("done cropping rasters")
 
 terra::writeRaster(r5, paste0(outF,"lcrasters/",city[k],"/output/",'esa.tif'), overwrite=TRUE)
+print("done writing raster")
 
 # Given that one is Geographic and the other planar, it is safer to project
 #fact1 <- round(dim(r5)[1:2] / dim(r3)[1:2]) # high resolution raster / low resolution raster. Proj does not need to be the same but should be equivalent extents
