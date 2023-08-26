@@ -94,6 +94,7 @@ cec <- read.csv('./misc/esa.csv') # I will keep the name cec so to avoid changin
 city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
 
+#city <- city[(city$pg_city %in% c('Houston')), 6]
 #city <- city[(city$pg_city %in% c('Phoenix')), 6]
 #city <- city[(city$pg_city %in% c('Peterborough')),6]
 #city <- city[(city$pg_city %in% c('Toronto')), 6]
@@ -225,11 +226,11 @@ newcrs <- terra::crs(r4, proj=TRUE)
 ext1Pj <- terra::project(ext1, newcrs)
 
 # Crop ESA land cover to city envelope extent
-r5 <- terra::crop(r4, ext1Pj)
+r5 <- terra::crop(r4, ext1Pj) # for some cities extPj has a lower ymin 
 print("done cropping rasters")
 
 terra::writeRaster(r5, paste0(outF,"lcrasters/",city[k],"/output/",'esa.tif'), overwrite=TRUE)
-print("done writing raster")
+print("done writing original raster")
 
 # Given that one is Geographic and the other planar, it is safer to project
 #fact1 <- round(dim(r5)[1:2] / dim(r3)[1:2]) # high resolution raster / low resolution raster. Proj does not need to be the same but should be equivalent extents
@@ -241,43 +242,54 @@ print("done aggregating raster")
 # transform cropped raster crs to EPSG 3857 , "EPSG:3857"
 r6 <- terra::project(r5, r3, method="near", align=TRUE)
 # crop to ensure rasters have the same extent
+
 r6 <- terra::crop(r6, r3)
+r6 <- terra::extend(r6, r3) # this is to ensure the rasters line up before masking. Houston was creating problems.
+print("done extending raster")
+
 #terra::writeRaster(r6, paste0(outF,"lcrasters/",city[k],"/output/",'cec_lcover.tif'), overwrite=TRUE)
 terra::writeRaster(r6, paste0(outF,"lcrasters/",city[k],"/output/",'esa_lcover.tif'), overwrite=TRUE)
 #plot(r6, type="classes")
+print("done writing raster")
+
 # Mask raster
-r7 <- terra::mask(r6, r3, inverse=TRUE, maskvalue=NA)
+r7 <- terra::mask(r6, r3, inverse=TRUE, maskvalue=NA) # this is for insurance
+print("done masking raster 1")
 
 rclM <- as.matrix(cecRes[,c(2,4)])
 #rclM <- matrix(rclM, ncol=2, byrow=TRUE)
 r8 <- terra::classify(r7, rclM) # Save this?
 terra::writeRaster(r8, paste0(outF,"lcrasters/",city[k],"/output/",'esa2_lcover.tif'), overwrite=TRUE)
 #plot(r8, type="classes")
-
+print("done writing raster 2")
 
 r9 <- terra::cover(r3, r8)
 r9 <- terra::subst(r9, 0, 12)
 #plot(r9, type="classes")
 terra::writeRaster(r9, paste0(outF,"lcrasters/",city[k],"/output/",'all_lcover2.tif'), overwrite=TRUE)
-
+print("done writing raster 3")
 
 
 # Create large mammal raster
 rclMlargeMam <- as.matrix(priority_table[,c("priority", "res_LM")])
 r10 <- terra::classify(r9, rclMlargeMam)
 terra::writeRaster(r10, paste0(outF,"lcrasters/",city[k],"/output/",'largemam_res2.tif'), overwrite=TRUE)
+print("done writing raster 4")
 
 
 # Create small mammal raster
 rclMsmallMam <- as.matrix(priority_table[,c("priority", "res_SM")])
 r11 <- terra::classify(r9, rclMsmallMam)
 terra::writeRaster(r11, paste0(outF,"lcrasters/",city[k],"/output/",'smallmam_res2.tif'), overwrite=TRUE)
+print("done writing raster 5")
 
 
 # Create source strength
 rclMsourceStr <- as.matrix(priority_table[,c("priority", "source_strength")])
 r12 <- terra::classify(r9, rclMsourceStr)
 terra::writeRaster(r12, paste0(outF,"lcrasters/",city[k],"/output/",'source_strength2.tif'), overwrite=TRUE)
+
+print("done writing raster 6")
 
 }
 
