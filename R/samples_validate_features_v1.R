@@ -2,7 +2,7 @@
 # Multi-city structural Connectivity Project -- Validate OSM
 #===========================================================
 
-# 2023-07-11
+# 2023-09-03
 # Code Authors:
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -69,9 +69,13 @@ city <- read.csv("./misc/mcsc_city_list1.csv")
 
 city <- city[!is.na(city$osm_id),]
 city$pg_city <- gsub(" ", "_", city$osm_city)
+#2023-07-23 (Toronto or Peterborough done by Joaquin separately)
 #city <- city[1:4,6] #[1] "Wilmington"  "Edmonton"    "Phoenix"     "Little_Rock"
-city <- city[6:10,6]#[1] "Vancouver"    "Berkeley"     "Pasadena"     "Pomona"       "Fort_Collins"
-
+#city <- city[6:10,6] #[1] "Vancouver"    "Berkeley"     "Pasadena"     "Pomona"       "Fort_Collins"
+city <- city[7:10,6] #[1] "Vancouver"    "Berkeley"     "Pasadena"     "Pomona"       "Fort_Collins"
+#city <- city[c(11, 13:18, 20),6] #Atlanta...Syracuse # I had to skip chicago, new york
+#city <- city[c(20),6] #Syracuse
+city <- city[c(21:22,25:30),6] #Skip Toronto, Peterborough as they were done previously
 
 for (k in 1:length(city)) {
   
@@ -103,7 +107,7 @@ for (k in 1:length(city)) {
   featureLabs <- unique(priority_table[,c(2,3)])
   
   featureLabs <- (unique(featureLabs[featureLabs$feature!='waterways', ])) # You need to get rid of water or waterways otherwise you get duplicates
-  featureLabs[nrow(featureLabs) + 1,] <- c(0, "null_water_skip")
+  featureLabs[nrow(featureLabs) + 1,] <- c(0, "null_water")
   
   dir.create(paste0(outF,city[k]))
   
@@ -127,6 +131,10 @@ for (k in 1:length(city)) {
   
 }
 
+# step 2: send CSV and geojson for Joaquin but check geojson in  QGIS first. Note that the CSV has more filed than the geojson.
+# step 3: load geojson files in QGIS and create images for Tiziana
+# step 4: run CEC code below and insert CEC fields into file for Tiziana to check. Convert file into Excel, name it as City_Completed2.xlsx
+
 
 #----------------------------------------------------------------------------
 # Add CEC land cover values to facilitate OSM validation
@@ -147,7 +155,8 @@ city <- c("Edmonton", "Little_Rock", "Phoenix", "Wilmington")
 
 
 pts1 <- list.files(fpath10, pattern=".geojson", recursive=T, full.names = T)
-pts1 <- pts1[c(2, 4, 6, 9)]
+#pts1 <- pts1[c(2, 4, 6, 9)]
+pts1 <- pts1[c(3, 13, 15, 7)] # Berklry, Pasadena, Pomona, Fort Collins
 
 
 extract1 <- foreach (i=1:length(pts1)) %do% {
