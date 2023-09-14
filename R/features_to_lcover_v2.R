@@ -122,8 +122,9 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(30),6] # San Diego is big too. Run alone
 #city <- city[c(31),6] # Aromas does not exist in DRAC's OSM. Skipping for now
 #city <- city[c(32:34),6] #
-city <- city[c(35:nrow(city)),6] # Now I have permission on public schema and can run Victoria
-
+#city <- city[c(35:nrow(city)),6] # Now I have permission on public schema and can run Victoria
+#city <- city[c(36),6] # Jackson. manually ran
+city <- city[c(37),6] # Key Largo
 
 pg_views1 <- unique(view_table$view)
 

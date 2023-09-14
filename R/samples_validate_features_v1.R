@@ -7,6 +7,7 @@
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
 #  Main aim: Get samples to validate OSM features. This code should be run locally (not server necessarily)
+# THis code was used to produce sample points for Joaquin to check
 
 #start.time <- Sys.time()
 #start.time
