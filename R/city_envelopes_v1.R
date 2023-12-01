@@ -2,7 +2,7 @@
 # Multi-city structural Connectivity Project
 #============================================
 
-# 2023-09-14
+# 2023-12-01
 # Code Authors:
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
@@ -78,7 +78,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[(city$pg_city %in% c('Toronto', 'Peterborough')),]
 #city <- city[(city$pg_city %in% c('Victoria')),]
 #city <- city[(city$pg_city %in% c('Jackson')),]
-city <- city[(city$pg_city %in% c('Key_Largo')),]
+#city <- city[(city$pg_city %in% c('Key_Largo')),]
+city <- city[(city$pg_city %in% c('Golden_Horseshoe')),]
 #print(city)
 
 # Loop for creating city spatial envelopes

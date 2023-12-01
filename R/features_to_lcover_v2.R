@@ -124,7 +124,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(32:34),6] #
 #city <- city[c(35:nrow(city)),6] # Now I have permission on public schema and can run Victoria
 #city <- city[c(36),6] # Jackson. manually ran
-city <- city[c(37),6] # Key Largo
+#city <- city[c(37),6] # Key Largo
+city <- city[c(38),6] # Golden Horseshoe
 
 pg_views1 <- unique(view_table$view)
 
