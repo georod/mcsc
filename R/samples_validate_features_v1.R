@@ -152,12 +152,14 @@ outF <- fpath10
 r4 <- rast("C:/Users/Peter R/Documents/data/gis/cec/Land_cover_2015v2_30m_TIF/NA_NALCMS_landcover_2015v2_30m/data/NA_NALCMS_landcover_2015v2_30m.tif")
 
 
-city <- c("Edmonton", "Little_Rock", "Phoenix", "Wilmington")
+#city <- c("Edmonton", "Little_Rock", "Phoenix", "Wilmington")
+city <- c("Toronto", "Peterborough")
 
 
 pts1 <- list.files(fpath10, pattern=".geojson", recursive=T, full.names = T)
 #pts1 <- pts1[c(2, 4, 6, 9)]
-pts1 <- pts1[c(3, 13, 15, 7)] # Berklry, Pasadena, Pomona, Fort Collins
+#pts1 <- pts1[c(3, 13, 15, 7)] # Berklry, Pasadena, Pomona, Fort Collins
+pts1 <- pts1[c(23, 14)] # Toronto, Peterborough
 
 
 extract1 <- foreach (i=1:length(pts1)) %do% {
@@ -173,7 +175,7 @@ for (i in 1:length(pts1))  {
   
 }
 
-
+# after creating the CEC file, you need to copy paste values into the completed file using Excel and save as Excel
 
 
 
