@@ -152,7 +152,7 @@ for (k in 1:length(city)) {
   
   #pg_union_views0 <- paste(readLines("./sql/features_union_string.txt"), collapse="\n")
   #pg_union_views0 <- source("./R/features_union_string.R")
-  source("./R/features_union_string_v2.r") # 2023-12-11 We added bridge<>'yes'
+  source("./R/features_union_string_v2.R") # 2023-12-11 We added bridge<>'yes'
   #source("./R/features_union_string_parking.r")
     
   
