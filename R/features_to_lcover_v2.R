@@ -125,7 +125,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(35:nrow(city)),6] # Now I have permission on public schema and can run Victoria
 #city <- city[c(36),6] # Jackson. manually ran
 #city <- city[c(37),6] # Key Largo
-city <- city[c(38),6] # Golden Horseshoe
+#city <- city[c(38),6] # Golden Horseshoe
+city <- city[c(12),6] # Chicago
 
 pg_views1 <- unique(view_table$view)
 
@@ -151,7 +152,7 @@ for (k in 1:length(city)) {
   
   #pg_union_views0 <- paste(readLines("./sql/features_union_string.txt"), collapse="\n")
   #pg_union_views0 <- source("./R/features_union_string.R")
-  source("./R/features_union_string.r")
+  source("./R/features_union_string_v2.r") # 2023-12-11 We added bridge<>'yes'
   #source("./R/features_union_string_parking.r")
     
   
