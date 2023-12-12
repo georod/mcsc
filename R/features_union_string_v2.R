@@ -40,7 +40,7 @@ SELECT way_id,
 	'cycleway','steps','bridleway','path','pedestrian','track',
 	'abandoned','bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 
 	'bus and cyclists') AND  
-	tags ->> 'footway' <> ('sidewalk') AND tags ->> 'bridge'<>('yes')
+	tags ->> 'footway' <> ('sidewalk') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -72,7 +72,7 @@ SELECT way_id,
 	'cycleway','steps','bridleway','path','pedestrian','track',
 	'abandoned','bicycle road', 'cyclestreet', 'cycleway lane','cycleway tracks', 
 	'bus and cyclists') AND  
-	tags ->> 'footway' IN ('sidewalk') AND tags ->> 'bridge'<>('yes')
+	tags ->> 'footway' IN ('sidewalk') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -100,7 +100,7 @@ SELECT way_id,
 	(ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('LineString', 3857) AS geom
     FROM lines t1 JOIN ", city0," t2
         ON st_intersects(t1.geom,t2.geom)
-	WHERE tags ->> 'highway' IN ('services','service','turning_loop','living_street') AND tags ->> 'bridge'<>('yes')
+	WHERE tags ->> 'highway' IN ('services','service','turning_loop','living_street') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -128,7 +128,7 @@ SELECT way_id,
 	(ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('LineString', 3857) AS geom
     FROM lines t1 JOIN ", city0," t2
         ON st_intersects(t1.geom,t2.geom)
-	WHERE tags ->> 'highway' IN ('residential', 'rest_area', 'busway') AND tags ->> 'bridge'<>('yes')
+	WHERE tags ->> 'highway' IN ('residential', 'rest_area', 'busway') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -156,7 +156,7 @@ SELECT way_id,
 	(ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('LineString', 3857) AS geom
     FROM lines t1 JOIN ", city0," t2
         ON st_intersects(t1.geom,t2.geom)
-	WHERE tags ->> 'highway' IN ('tertiary', ' tertiary_link') AND tags ->> 'bridge'<>('yes')
+	WHERE tags ->> 'highway' IN ('tertiary', ' tertiary_link') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -184,7 +184,7 @@ SELECT way_id,
 	(ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('LineString', 3857) AS geom
     FROM lines t1 JOIN ", city0," t2
         ON st_intersects(t1.geom,t2.geom)
-	WHERE tags ->> 'highway' IN ('primary', 'primary_link', 'secondary', 'secondary_link') AND tags ->> 'bridge'<>('yes')
+	WHERE tags ->> 'highway' IN ('primary', 'primary_link', 'secondary', 'secondary_link') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -212,7 +212,7 @@ SELECT way_id,
 	(ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('LineString', 3857) AS geom
     FROM lines t1 JOIN ", city0," t2
         ON st_intersects(t1.geom,t2.geom)
-	WHERE tags ->> 'highway' IN ('trunk', 'trunk_link') AND tags ->> 'bridge'<>('yes')
+	WHERE tags ->> 'highway' IN ('trunk', 'trunk_link') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -240,7 +240,7 @@ SELECT way_id,
 	(ST_DUMP(ST_Intersection(t1.geom, t2.geom))).geom::geometry('LineString', 3857) AS geom
     FROM lines t1 JOIN ", city0," t2
         ON st_intersects(t1.geom,t2.geom)
-	WHERE tags ->> 'highway' IN ('motorway','motorway_link', 'motorway_junction') AND tags ->> 'bridge'<>('yes')
+	WHERE tags ->> 'highway' IN ('motorway','motorway_link', 'motorway_junction') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
@@ -277,7 +277,7 @@ SELECT way_id,
     'secondary', 'secondary_link',
     'tertiary', 'tertiary_link',
     'motorway','motorway_link','trunk_link', 'trunk',
-    'corridor','elevator','platform','platform','crossing','proposed', 'razed') AND tags ->> 'bridge'<>('yes')
+    'corridor','elevator','platform','platform','crossing','proposed', 'razed') AND (tags ->> 'bridge'='no' OR tags ->> 'bridge' is null)
 		) t1
 	) t2
 	) t3
