@@ -130,9 +130,9 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 
 # version 9 using features_union_string_v2.R.
 #city <- city[c(1:4,6:13, 15:18),6] # Skip Freiburg, National Capital
-city <- city[c(20:29, 32:37),6] # Skip Aromas does not exist in DRAC's OSM.
+#city <- city[c(20:29, 32:37),6] # Skip Aromas does not exist in DRAC's OSM.
 #city <- city[c(14),6] # I was able to run the National Capital using 120GB of RAM and 5 hours
-#city <- city[c(19),6] # New york needs more memory. I gave it 60GB & 3 hours. It completed successfully.
+city <- city[c(19),6] # New york needs more memory. I gave it 60GB & 3 hours. It completed successfully.
 #city <- city[c(30),6] # San Diego is big too. Run alone
 #city <- city[c(38),6] # Golden Horseshoe
 
