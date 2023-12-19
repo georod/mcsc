@@ -105,7 +105,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(37),6] # Key Largo
 #city <- city[c(38),6] # Golden Horseshoe
 #city <- city[c(12),6] # Chicago
-city <- city[c(1:4, 6:15, 17:30,32:38) ,6] # #Skip Freiburg & Aromas. Also Mexico city until I download the tile for Mexico (16).
+city <- city[c(1:4, 6:15, 17:30,32:36,38) ,6] # #Skip Freiburg & Aromas. Also Mexico city until I download the tile for Mexico (16). Key Largo did not work, skipping it.
 
 #=================================
 # Connect to PG db - STEP 2
