@@ -94,7 +94,7 @@ for (j in 1:nrow(city)) {
   
   dbSendQuery(con_pg, paste0("ALTER TABLE ", city$pg_city[j],"_env", " ADD CONSTRAINT ", city$pg_city[j],"_env", "_pkey PRIMARY KEY (sid);"))
   
-  dbSendQuery(con_pg, paste0("CREATE INDEX ", city$pg_city[j],"_env", "_geom_idx ON ", city$pg_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100) TABLESPACE pg_default;") )
+  dbSendQuery(con_pg, paste0("CREATE INDEX ", city$pg_city[j],"_env", "_geom_idx ON ", city$pg_city[j],"_env",  " USING gist (geom) WITH (FILLFACTOR=100);") )
 
   print(city$pg_city[j])
 }
