@@ -136,8 +136,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(19),6] # New york needs more memory. I gave it 60GB & 3 hours. It completed successfully.
 #city <- city[c(30),6] # San Diego is big too. Run alone
 #city <- city[c(38),6] # Golden Horseshoe
-city <- city[c(39:40),6] # Seattle, San Francisco
-#city <- city[c(41),6] # Indianapolis
+#city <- city[c(39:40),6] # Seattle, San Francisco
+city <- city[c(41),6] # Indianapolis
 #city <- city[c(42),6] # Berkeley2
 
 pg_views1 <- unique(view_table$view)
