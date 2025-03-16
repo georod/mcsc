@@ -36,7 +36,7 @@ library(dplyr)
 # Set folder & files paths - STEP 1
 #==================================
 # github project folder on server
-setwd("~/projects/def-mfortin/georod/scripts/mcsc/")
+setwd("~/projects/def-mfortin/georod/scripts/github/mcsc/")
 # project folder on desktop
 #setwd("~/github/mcsc/")
 #setwd("C:/Users/Peter R/github/mcsc")
