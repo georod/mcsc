@@ -1,0 +1,15 @@
+SET standard_conforming_strings = OFF;
+DROP TABLE IF EXISTS "public"."indianapolis3_env" CASCADE;
+BEGIN;
+CREATE TABLE "public"."indianapolis3_env" ( "ogc_fid" SERIAL, CONSTRAINT "indianapolis3_env_pk" PRIMARY KEY ("ogc_fid") );
+SELECT AddGeometryColumn('public','indianapolis3_env','geom',3857,'POLYGON',2);
+CREATE INDEX "indianapolis3_env_geom_geom_idx" ON "public"."indianapolis3_env" USING GIST ("geom");
+ALTER TABLE "public"."indianapolis3_env" ADD COLUMN "sid" NUMERIC(10,0);
+ALTER TABLE "public"."indianapolis3_env" ADD COLUMN "relation_id" NUMERIC(10,0);
+ALTER TABLE "public"."indianapolis3_env" ADD COLUMN "feature" VARCHAR(30);
+ALTER TABLE "public"."indianapolis3_env" ADD COLUMN "type" VARCHAR(30);
+ALTER TABLE "public"."indianapolis3_env" ADD COLUMN "material" VARCHAR(30);
+ALTER TABLE "public"."indianapolis3_env" ADD COLUMN "size" VARCHAR(30);
+INSERT INTO "public"."indianapolis3_env" ("geom" , "sid", "relation_id", "feature", "type", "material", "size") VALUES ('0103000020110F000001000000050000003837A719D35662C173C6B29D808A52411B61011EBD3C62C1A5FBA3C0818A52411661011EBD3C62C127224E9CF4565241D04CE7E1D25662C1B6FEB5BDF55652413837A719D35662C173C6B29D808A5241', 1, 18438530, 'background', 'Indianapolis', '8', NULL);
+INSERT INTO "public"."indianapolis3_env" ("geom" , "sid", "relation_id", "feature", "type", "material", "size") VALUES ('0103000020110F00000100000005000000656E1688285C62C1C09BBBF56B9D52414C78D563AD3C62C1DF4FB4C2B19D5241546A0447B53C62C1B68199C2712A5241D16D1688285C62C1F72A820CE02A5241656E1688285C62C1C09BBBF56B9D5241', 2, 10000000, 'background', 'Indianapolis3', '8', NULL);
+COMMIT;

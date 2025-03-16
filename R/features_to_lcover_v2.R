@@ -138,7 +138,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(38),6] # Golden Horseshoe
 #city <- city[c(39:40),6] # Seattle, San Francisco
 #city <- city[c(41),6] # Indianapolis
-city <- city[c(42),6] # Berkeley2
+#city <- city[c(42),6] # Berkeley2
+city <- city[c(43),6] # Indianapolis3
 
 pg_views1 <- unique(view_table$view)
 
