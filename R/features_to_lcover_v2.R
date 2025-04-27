@@ -139,7 +139,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(39:40),6] # Seattle, San Francisco
 #city <- city[c(41),6] # Indianapolis
 #city <- city[c(42),6] # Berkeley2
-city <- city[c(43),6] # Indianapolis3
+#city <- city[c(43),6] # Indianapolis3
+city <- city[c(44),6] # 2025-04-26: San Francisco2. Tiziana provided a bounding box that included all cameras
 
 pg_views1 <- unique(view_table$view)
 
@@ -159,7 +160,7 @@ for (k in 1:length(city)) {
   #-----------------------------------
   
   
-  city0 <- paste0(city[k],"_env")
+  city0 <- paste0(city[k],"_env") # this object is used in features_union_string_v2.R
   
   # Run features_union_string to get object pg_union_views0
   

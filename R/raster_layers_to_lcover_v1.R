@@ -91,7 +91,8 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[6:10 ,6]
 #city <- city[c(1:4, 6:30,32:35) ,6] # #Skip Freiburg & Aromas
 #city <- city[c(36) ,6] # Jackson
-city <- city[c(37),6] # Key Largo
+#city <- city[c(37),6] # Key Largo
+city <- city[c(44),6] # 2025-04-26: San Francisco2. Tiziana provided a bounding box that included all cameras
 
 
 #=================================

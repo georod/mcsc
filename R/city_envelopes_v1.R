@@ -2,11 +2,13 @@
 # Multi-city structural Connectivity Project
 #============================================
 
-# 2023-12-01
+# 2025-04-26
 # Code Authors:
 # Tiziana Gelmi-Candusso, Peter Rodriguez
 
 # Main aim: Create city envelopes to be used as study areas
+# Notes:
+# - I am no longer able to write to Postgres db on DRAC. I used DRAC's psql to create new envelopes.
 
 
 #===============================
