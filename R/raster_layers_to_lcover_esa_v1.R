@@ -108,7 +108,7 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(1:4, 6:15, 17:30,32:36,38) ,6] # #Skip Freiburg & Aromas. Also Mexico city until I download the tile for Mexico (16). Key Largo did not work, skipping it.
 #city <- city[c(39:40),6] # Seattle, San Francisco
 #city <- city[c(41),6] # Indianapolis
-city <- city[c(42,43),6] # Berkeley2, Indianapolis3
+#city <- city[c(42,43),6] # Berkeley2, Indianapolis3
 
 
 #=================================
