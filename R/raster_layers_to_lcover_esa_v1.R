@@ -109,8 +109,6 @@ city$pg_city <- gsub(" ", "_", city$osm_city)
 #city <- city[c(39:40),6] # Seattle, San Francisco
 #city <- city[c(41),6] # Indianapolis
 #city <- city[c(42,43),6] # Berkeley2, Indianapolis3
-city <- city[c(44),6] # 2025-04-26: San Francisco2. Tiziana provided a bounding box that included all cameras
-
 
 
 #=================================
